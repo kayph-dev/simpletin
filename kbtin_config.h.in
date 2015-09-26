@@ -4,6 +4,7 @@
 #define VERSION "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@"
 
 #cmakedefine HAVE_GLIB
+#cmakedefine HAVE_GNUTLS
 #cmakedefine HAVE_UTIL
 #cmakedefine HAVE_NSL
 #cmakedefine HAVE_RESOLVE
