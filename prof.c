@@ -1,4 +1,3 @@
-#include "config.h"
 #include "tintin.h"
 #include "protos/hash.h"
 #include "protos/llist.h"

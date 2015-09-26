@@ -1,0 +1,40 @@
+#ifndef __KBTIN_KBTINCONFIG_H__
+#define __KBTIN_KBITCONFIG_H__
+
+#define VERSION "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@"
+
+#cmakedefine HAVE_GLIB
+
+#cmakedefine HAVE_STRINGS_H
+#cmakedefine HAVE_STRING_H
+#cmakedefine HAVE_SYS_TIME_H
+#cmakedefine HAVE_TERMIOS_H
+#cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_STROPTS_H
+#cmakedefine HAVE_PTY_H
+#cmakedefine HAVE_LIBUTIL_H
+#cmakedefine HAVE_INTTYPES_H
+#cmakedefine HAVE_MEMORY_H
+#cmakedefine HAVE_STDINT_H
+#cmakedefine HAVE_STDLIB_H
+#cmakedefine HAVE_SYS_STAT_H
+#cmakedefine HAVE_SYS_TYPES_H
+#cmakedefine HAVE_SYS_WAIT_H
+
+#cmakedefine HAVE_FORKPTY
+#cmakedefine HAVE_GETADDRINFO
+#cmakedefine HAVE_GETPT
+#cmakedefine HAVE_GRANTPT
+#cmakedefine HAVE_MEMCPY
+#cmakedefine HAVE_POSIX_OPENPT
+#cmakedefine HAVE_PTSNAME
+#cmakedefine HAVE_REGCOMP
+#cmakedefine HAVE_STRLCPY
+#cmakedefine HAVE_VPRINTF
+#cmakedefine HAVE_VSNPRINTF
+#cmakedefine HAVE_WCWIDTH
+#cmakedefine HAVE__GETPTY
+#cmakedefine HAVE_SNPRINTF
+
+#endif
+

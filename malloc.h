@@ -1,4 +1,4 @@
-#include "config.h"
+#include "kbtin_config.h"
 #ifdef HAVE_GLIB
 # include <glib.h>
 # define MALLOC(s)      g_slice_alloc(s)

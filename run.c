@@ -5,7 +5,7 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#if HAVE_TERMIOS_H
+#ifdef HAVE_TERMIOS_H
 # include <termios.h>
 #endif
 #ifdef HAVE_GRANTPT
@@ -137,7 +137,7 @@ void termdebug_command(char *arg, struct session *ses)
 }
 #endif
 
-
+#ifndef HAVE_FORKPTY
 static int forkpty(int *amaster,char *dummy,struct termios *termp, struct winsize *wp)
 {
     int master,slave;
@@ -270,6 +270,7 @@ ok:
         return pid;
     }
 }
+#endif
 #endif
 
 void pty_resize(int fd,int sx,int sy)

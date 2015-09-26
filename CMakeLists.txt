@@ -1,0 +1,112 @@
+cmake_minimum_required(VERSION 2.8)
+project(kbtin)
+
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 1)
+set(VERSION_PATCH 0)
+
+set(SOURCES
+    action.c
+    alias.c
+    antisub.c
+    files.c
+    glob.c
+    help.c
+    highlight.c
+    history.c
+    ivars.c
+    llist.c
+    main.c
+    misc.c
+    net.c
+    parse.c
+    path.c
+    session.c
+    substitute.c
+    ticks.c
+    utils.c
+    variables.c
+    events.c
+    user.c
+    run.c
+    colors.c
+    routes.c
+    bind.c
+    telnet.c
+    crc.c
+    hash.c
+    regexp.c
+    prof.c
+    hooks.c
+    unicode.c
+    user_pipe.c
+    user_tty.c
+    wcwidth.c
+    chinese.c
+    print.c
+    ssl.c)
+
+include_directories(${PROJECT_BINARY_DIR})
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb")
+
+include(CheckIncludeFile)
+include(CheckFunctionExists)
+include(CheckSymbolExists)
+include(CheckLibraryExists)
+
+check_include_file("strings.h" HAVE_STRINGS_H)
+check_include_file("string.h" HAVE_STRING_H)
+check_include_file("sys/time.h" HAVE_SYS_TIME_H)
+check_include_file("termios.h" HAVE_TERMIOS_H)
+check_include_file("unistd.h" HAVE_UNISTD_H)
+check_include_file("stropts.h" HAVE_STROPTS_H)
+check_include_file("pty.h" HAVE_PTY_H)
+check_include_file("libutil.h" HAVE_LIBUTIL_H)
+check_include_file("inttypes.h" HAVE_INTTYPES_H)
+check_include_file("memory.h" HAVE_MEMORY_H)
+check_include_file("stdint.h" HAVE_STDINT_H)
+check_include_file("stdlib.h" HAVE_STDLIB_H)
+check_include_file("sys/stat.h" HAVE_SYS_STAT_H)
+check_include_file("sys/types.h" HAVE_SYS_TYPES_H)
+check_include_file("sys/wait.h" HAVE_SYS_WAIT_H)
+
+check_function_exists("getaddrinfo" HAVE_GETADDRINFO)
+check_function_exists("getpt" HAVE_GETPT)
+check_function_exists("grantpt" HAVE_GRANTPT)
+check_function_exists("openpt" HAVE_POSIX_OPENPT)
+check_function_exists("ptsname" HAVE_PTSNAME)
+check_function_exists("regcomp" HAVE_REGCOMP)
+check_function_exists("strlcpy" HAVE_STRLCPY)
+check_function_exists("wcwidth" HAVE_WCWIDTH)
+check_function_exists("_getpty" HAVE__GETPTY)
+
+check_symbol_exists("snprintf" "stdio.h" HAVE_SNPRINTF)
+check_symbol_exists("vprintf" "stdio.h" HAVE_VPRINTF)
+check_symbol_exists("vsnprintf" "stdio.h" HAVE_VSNPRINTF)
+check_symbol_exists("memcpy" "string.h" HAVE_MEMCPY)
+
+check_library_exists("util" "forkpty" "" HAVE_FORKPTY)
+
+
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 99)
+
+find_package(GLIB2)
+find_package(Util)
+
+if (UTIL_FOUND)
+    target_link_libraries(${PROJECT_NAME} ${Util_LIBRARY})
+endif (UTIL_FOUND)
+
+if (GLIB2_FOUND)
+    set(HAVE_GLIB 1)
+    include_directories(${GLIB2_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${GLIB2_LIBRARIES})
+endif (GLIB2_FOUND)
+
+configure_file(kbtin_config.h.in ${PROJECT_BINARY_DIR}/kbtin_config.h)
+

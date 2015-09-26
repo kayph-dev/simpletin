@@ -1,4 +1,4 @@
-#include "config.h"
+#include "kbtin_config.h"
 #ifndef HAVE_WCWIDTH
 
 /*
