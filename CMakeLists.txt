@@ -56,6 +56,7 @@ include(CheckIncludeFile)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 include(CheckLibraryExists)
+include(TestBigEndian)
 
 check_include_file("strings.h" HAVE_STRINGS_H)
 check_include_file("string.h" HAVE_STRING_H)
@@ -82,6 +83,7 @@ check_function_exists("regcomp" HAVE_REGCOMP)
 check_function_exists("strlcpy" HAVE_STRLCPY)
 check_function_exists("wcwidth" HAVE_WCWIDTH)
 check_function_exists("_getpty" HAVE__GETPTY)
+check_function_exists("iconv" HAVE_ICONV)
 
 check_symbol_exists("snprintf" "stdio.h" HAVE_SNPRINTF)
 check_symbol_exists("vprintf" "stdio.h" HAVE_VPRINTF)
@@ -90,6 +92,8 @@ check_symbol_exists("memcpy" "string.h" HAVE_MEMCPY)
 
 check_library_exists("util" "forkpty" "" HAVE_FORKPTY)
 
+find_file(HAVE_DEV_PTMX NAMES /dev/ptmx PATHS / NO_DEFAULT_PATH)
+test_big_endian(WORDS_BIGENDIAN)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
@@ -97,16 +101,49 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 99)
 
 find_package(GLIB2)
 find_package(Util)
+find_package(Nsl)
+find_package(Resolve)
+find_package(Socket)
+find_package(GnuTLS)
+find_package(ZLIB)
 
 if (UTIL_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Util_LIBRARY})
+    set(HAVE_UTIL 1)
 endif (UTIL_FOUND)
+
+if (NSL_FOUND)
+    target_link_libraries(${PROJECT_NAME} ${Nsl_LIBRARY})
+    set(HAVE_NSL 1)
+endif (NSL_FOUND)
+    
+if (RESOLVE_FOUND)
+    target_link_libraries(${PROJECT_NAME} ${Resolve_LIBRARY})
+    set(HAVE_RESOLVE 1)
+endif (RESOLVE_FOUND)
+
+if (SOCKET_FOUND)
+    target_link_libraries(${PROJECT_NAME} ${Socket_LIBRARY})
+    set(HAVE_SOCKET 1)
+endif (SOCKET_FOUND)
 
 if (GLIB2_FOUND)
     set(HAVE_GLIB 1)
     include_directories(${GLIB2_INCLUDE_DIRS})
     target_link_libraries(${PROJECT_NAME} ${GLIB2_LIBRARIES})
 endif (GLIB2_FOUND)
+
+if (GNUTLS_FOUND)
+    target_link_libraries(${PROJECT_NAME} ${GNUTLS_LIBRARIES})
+    include_directories(${GNUTLS_INCLUDE_DIR})
+    set(HAVE_GNUTLS 1)
+endif (GNUTLS_FOUND)
+
+if (ZLIB_FOUND)
+    set(HAVE_ZLIB 1)
+    target_link_libraries(${PROJECT_NAME} ${ZLIB_LIBRARIES})
+    include_directories(${ZLIB_INCLUDE_DIRS})
+endif (ZLIB_FOUND)
 
 configure_file(kbtin_config.h.in ${PROJECT_BINARY_DIR}/kbtin_config.h)
 

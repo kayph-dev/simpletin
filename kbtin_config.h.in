@@ -4,6 +4,12 @@
 #define VERSION "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@"
 
 #cmakedefine HAVE_GLIB
+#cmakedefine HAVE_UTIL
+#cmakedefine HAVE_NSL
+#cmakedefine HAVE_RESOLVE
+#cmakedefine HAVE_SOCKET
+#cmakedefine HAVE_DEV_PTMX
+#cmakedefine WORDS_BIGENDIAN
 
 #cmakedefine HAVE_STRINGS_H
 #cmakedefine HAVE_STRING_H
@@ -35,6 +41,7 @@
 #cmakedefine HAVE_WCWIDTH
 #cmakedefine HAVE__GETPTY
 #cmakedefine HAVE_SNPRINTF
+#cmakedefine HAVE_ICONV
 
 #endif
 
