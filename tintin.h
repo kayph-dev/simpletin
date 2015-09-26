@@ -205,7 +205,7 @@
 #define _GNU_SOURCE
 #include "kbtin_config.h"
 #include <stdio.h>
-#include "_stdint.h"
+#include <stdint.h>
 #include <iconv.h>
 #include <ctype.h>
 #include <wctype.h>
