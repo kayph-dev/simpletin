@@ -32,11 +32,9 @@ int utf8_ncpy(char *d, char *s, int n, int maxb)
 
     if (--maxb<0)
         return 0;
-    while (*s && maxb)
-    {
+    while (*s && maxb) {
         if ((*s&0xc0)!=0x80)
-            if (nc++>=n)
-            {
+            if (nc++>=n) {
                 nc--;
                 break;
             }
@@ -79,11 +77,9 @@ int utf8_to_wc(wchar_t *d, char *s, int n)
 
     s0=s;
     cnt=surrogate=tc=0;
-    for (;(ic=*s);s++)
-    {
+    for (; (ic=*s); s++) {
         if (ic>0x7f)
-            if (cnt>0 && (ic&0xc0)==0x80)
-            {
+            if (cnt>0 && (ic&0xc0)==0x80) {
                 tc=(tc<<6) | (ic&0x3f);
                 if (!--cnt)
                     c=tc;
@@ -102,25 +98,19 @@ int utf8_to_wc(wchar_t *d, char *s, int n)
                  * encapsulation anyway.  We don't go out of our way to detect
                  * unpaired surrogates, though.
                  */
-                if (c>=0xD800 && c<=0xDFFF)     /* UTF-16 surrogates */
-                {
-                    if (c<0xDC00)       /* lead surrogate */
-                    {
+                if (c>=0xD800 && c<=0xDFFF) {   /* UTF-16 surrogates */
+                    if (c<0xDC00) {     /* lead surrogate */
                         surrogate=c;
                         continue;
-                    }
-                    else                /* trailing surrogate */
-                    {
+                    } else {            /* trailing surrogate */
                         c=(surrogate<<10)+c+
-                            (0x10000 - (0xD800 << 10) - 0xDC00);
+                          (0x10000 - (0xD800 << 10) - 0xDC00);
                         surrogate=0;
                         if (c<0x10000)  /* malformed pair */
                             c=0xFFFD;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 if (cnt>0)
                     OUTC(0xFFFD,); /* previous sequence was incomplete */
                 if ((ic&0xe0)==0xc0)
@@ -133,15 +123,13 @@ int utf8_to_wc(wchar_t *d, char *s, int n)
                     cnt=4, tc=ic&0x03;
                 else if ((ic&0xfe)==0xfc)
                     cnt=5, tc=ic&0x01;
-                else
-                {
+                else {
                     OUTC(0xFFFD, s++);
                     cnt=0;
                 }
                 continue;
             }
-        else
-        {
+        else {
             if (cnt>0)
                 OUTC(0xFFFD,); /* previous sequence was incomplete */
             cnt=0, c=ic;
@@ -164,22 +152,18 @@ int wc_to_utf8(char *d, const wchar_t *s, int n, int maxb)
     maxd=d+maxb-8;
 #define uv ((unsigned int)(*s))
 #define vb d
-    for (;n-- && *s && d<maxd;s++)
-    {
-        if (uv<0x80)
-        {
+    for (; n-- && *s && d<maxd; s++) {
+        if (uv<0x80) {
             *vb++=uv;
             continue;
         }
-        if (uv < 0x800)
-        {
+        if (uv < 0x800) {
             *vb++ = ( uv >>  6)         | 0xc0;
             *vb++ = ( uv        & 0x3f) | 0x80;
             continue;
         }
 #ifdef WCHAR_IS_UCS4
-        if (uv < 0x10000)
-        {
+        if (uv < 0x10000) {
 #endif
             *vb++ = ( uv >> 12)         | 0xe0;
             *vb++ = ((uv >>  6) & 0x3f) | 0x80;
@@ -187,8 +171,7 @@ int wc_to_utf8(char *d, const wchar_t *s, int n, int maxb)
 #ifdef WCHAR_IS_UCS4
             continue;
         }
-        if (uv < 0x110000)
-        {
+        if (uv < 0x110000) {
             *vb++ = ( uv >> 18)         | 0xf0;
             *vb++ = ((uv >> 12) & 0x3f) | 0x80;
             *vb++ = ((uv >>  6) & 0x3f) | 0x80;
@@ -240,8 +223,7 @@ int wc_to_mb(char *d, wchar_t *s, int n, mbstate_t *cs)
 {
     int res, len=0;
 
-    while (*s && n--)
-    {
+    while (*s && n--) {
         res=wcrtomb(d, *s++, cs);
 
         if (res!=-1)
@@ -272,16 +254,13 @@ void local_to_utf8(char *d, char *s, int maxb, mbstate_t *cs)
     wchar_t c;
 
     PROFPUSH("conv: local->utf8");
-    if (!cs)
-    {
+    if (!cs) {
         memset(&cs0, 0, sizeof(cs0));
         cs=&cs0;
     }
     len=strlen(s);
-    while (len && maxb>10)
-    {
-        switch (n=mbrtowc(&c, s, len, cs))
-        {
+    while (len && maxb>10) {
+        switch (n=mbrtowc(&c, s, len, cs)) {
         case -2: /* truncated last character */
             *d++=BAD_CHAR;
         case 0:
@@ -329,15 +308,14 @@ int new_conv(struct charset_conv *conv, char *name, int dir)
     if (!strcasecmp(name, "UTF-8") || !strcasecmp(name, "UTF8"))
         conv->mode=1;
     else if (!strcasecmp(name, "ANSI_X3.4-1968")
-          || !strcasecmp(name, "ISO-8859-1")
-          || !strcasecmp(name, "ISO8859-1"))
+             || !strcasecmp(name, "ISO-8859-1")
+             || !strcasecmp(name, "ISO8859-1"))
         conv->mode=0;
     else if (!strcasecmp(name, "ASCII"))
         conv->mode=3;
-    else
-    {
+    else {
         if ((dir<=0 && (conv->i_in=iconv_open("UTF-8", name))==(iconv_t)-1) ||
-            (dir>=0 && (conv->i_out=iconv_open(name, "UTF-8"))==(iconv_t)-1))
+                (dir>=0 && (conv->i_out=iconv_open(name, "UTF-8"))==(iconv_t)-1))
             return 0;
         conv->mode=2;
     }
@@ -351,8 +329,7 @@ void nullify_conv(struct charset_conv *conv)
 
 void cleanup_conv(struct charset_conv *conv)
 {
-    if (conv->mode==2)
-    {
+    if (conv->mode==2) {
         if (conv->dir<=0)
             iconv_close(conv->i_in);
         if (conv->dir>=0)
@@ -368,25 +345,19 @@ void convert(struct charset_conv *conv, char *outbuf, char *inbuf, int dir)
     int cl;
 
 #ifndef NDEBUG
-    if (dir==-1)
-    {
+    if (dir==-1) {
         if (conv->dir>0)
             syserr("trying to do input on an output-only conversion");
-    }
-    else if (dir==1)
-    {
+    } else if (dir==1) {
         if (conv->dir<0)
             syserr("trying to do output on an input-only conversion");
-    }
-    else
+    } else
         syserr("invalid conversion direction");
 #endif
 
-    switch (conv->mode)
-    {
+    switch (conv->mode) {
     case 3:             /* ASCII => UTF-8 */
-        if (dir<0)
-        {
+        if (dir<0) {
             while (*inbuf)
                 if ((unsigned char)*inbuf>=127)
                     *outbuf++=BAD_CHAR, inbuf++;
@@ -394,9 +365,7 @@ void convert(struct charset_conv *conv, char *outbuf, char *inbuf, int dir)
                     *outbuf++=*inbuf++;
             *outbuf=0;
             return;
-        }
-        else            /* UTF-8 => ASCII */
-        {
+        } else {        /* UTF-8 => ASCII */
             while (*inbuf)
                 if ((unsigned char)*inbuf>=127)
                     *outbuf++=translit((unsigned char)*inbuf++);
@@ -406,8 +375,7 @@ void convert(struct charset_conv *conv, char *outbuf, char *inbuf, int dir)
             return;
         }
     case 0:
-        if (dir<0)      /* ISO-8859-1 => UTF-8 */
-        {
+        if (dir<0) {    /* ISO-8859-1 => UTF-8 */
             wptr=wbuf;
             while (*inbuf)
                 if ((unsigned char)*inbuf>=127 && (unsigned char)*inbuf<0xA0)
@@ -416,13 +384,10 @@ void convert(struct charset_conv *conv, char *outbuf, char *inbuf, int dir)
                     *wptr++=(unsigned char)*inbuf++;
             outbuf+=wc_to_utf8(outbuf, wbuf, wptr-wbuf, BUFFER_SIZE);
             return;
-        }
-        else            /* UTF-8 => ISO-8859-1 */
-        {
+        } else {        /* UTF-8 => ISO-8859-1 */
             utf8_to_wc(wbuf, inbuf, BUFFER_SIZE-1);
             wptr=wbuf;
-            while (*wptr)
-            {
+            while (*wptr) {
                 if (*wptr>0xFF)
                     *outbuf++=translit(*wptr++);
                 else
@@ -432,14 +397,11 @@ void convert(struct charset_conv *conv, char *outbuf, char *inbuf, int dir)
             return;
         }
     case 1:     /* UTF-8 => UTF-8 */
-        if (dir<0)      /* input: sanitize it */
-        {
+        if (dir<0) {    /* input: sanitize it */
             utf8_to_wc(wbuf, inbuf, BUFFER_SIZE-1);
             outbuf+=wc_to_utf8(outbuf, wbuf, -1, BUFFER_SIZE);
             return;
-        }
-        else            /* output: trust ourself */
-        {
+        } else {        /* output: trust ourself */
             while (*inbuf)
                 *outbuf++=*inbuf++;
             *outbuf++=0;
@@ -448,21 +410,16 @@ void convert(struct charset_conv *conv, char *outbuf, char *inbuf, int dir)
     case 2:
         il=strlen(inbuf);
         ol=BUFFER_SIZE-1;
-        while (il>0)
-        {
+        while (il>0) {
             if (iconv((dir<0) ? conv->i_in : conv->i_out,
-                &inbuf, &il, &outbuf, &ol))
-            {
+                      &inbuf, &il, &outbuf, &ol)) {
                 if (errno==E2BIG)
                     break;
-                if (dir<0)
-                {
+                if (dir<0) {
                     *outbuf++=translit((unsigned char)*inbuf++);
                     --il;
                     --ol;
-                }
-                else
-                {
+                } else {
                     cl=utf8_to_wc(wbuf, inbuf, 1);
                     inbuf+=cl;
                     *outbuf++=translit(wbuf[0]);

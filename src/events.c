@@ -27,8 +27,7 @@ static void list_events(char *arg, struct session *ses)
     int flag;
     struct eventnode *ev;
 
-    if (!ses)
-    {
+    if (!ses) {
         tintin_eprintf(ses,"#NO SESSION ACTIVE => NO EVENTS!");
         return;
     }
@@ -37,22 +36,16 @@ static void list_events(char *arg, struct session *ses)
     ev = ses->events;
     arg = get_arg_in_braces(arg, left, 1);
 
-    if (!*left)
-    {
+    if (!*left) {
         tintin_printf(ses,"#Defined events:");
-        while (ev != NULL)
-        {
+        while (ev != NULL) {
             tintin_printf(ses, "(%d)\t {%s}", ev->time-ct, ev->event);
             ev = ev->next;
         }
-    }
-    else
-    {
+    } else {
         flag = 0;
-        while (ev != NULL)
-        {
-            if (match(left, ev->event))
-            {
+        while (ev != NULL) {
+            if (match(left, ev->event)) {
                 tintin_printf(ses, "(%d)\t {%s}", ev->time-ct, ev->event);
                 flag = 1;
             }
@@ -70,8 +63,7 @@ void delay_command(char *arg, struct session *ses)
     time_t delay;
     struct eventnode *ev, *ptr, *ptrlast;
 
-    if (!ses)
-    {
+    if (!ses) {
         tintin_eprintf(ses,"#NO SESSION ACTIVE => NO EVENTS!");
         return;
     }
@@ -82,14 +74,12 @@ void delay_command(char *arg, struct session *ses)
     substitute_myvars(temp, left, ses);
     substitute_vars(right, temp);
     substitute_myvars(temp, right, ses);
-    if (!*right)
-    {
+    if (!*right) {
         list_events(left, ses);
         return;
     }
 
-    if (!*left || (delay=strtol(left,&cptr,10))<0 || *cptr)
-    {
+    if (!*left || (delay=strtol(left,&cptr,10))<0 || *cptr) {
         tintin_eprintf(ses, "#EVENT IGNORED (DELAY={%s}), NEGATIVE DELAY",left);
         return;
     }
@@ -101,18 +91,13 @@ void delay_command(char *arg, struct session *ses)
 
     if (ses->events == NULL)
         ses->events = ev;
-    else if (ses->events->time > ev->time)
-    {
+    else if (ses->events->time > ev->time) {
         ev->next = ses->events;
         ses->events = ev;
-    }
-    else
-    {
+    } else {
         ptr = ses->events;
-        while ((ptrlast = ptr) && (ptr = ptr->next))
-        {
-            if (ptr->time > ev->time)
-            {
+        while ((ptrlast = ptr) && (ptr = ptr->next)) {
+            if (ptr->time > ev->time) {
                 ev->next = ptr;
                 ptrlast->next = ev;
                 return;
@@ -133,8 +118,7 @@ void event_command(char *arg, struct session *ses)
 static void remove_event(struct eventnode **ev)
 {
     struct eventnode *tmp;
-    if (*ev)
-    {
+    if (*ev) {
         tmp = (*ev)->next;
         SFREE((*ev)->event);
         TFREE(*ev, struct eventnode);
@@ -149,8 +133,7 @@ void undelay_command(char *arg, struct session *ses)
     int flag;
     struct eventnode **ev;
 
-    if (!ses)
-    {
+    if (!ses) {
         tintin_eprintf(ses,"#NO SESSION ACTIVE => NO EVENTS!");
         return;
     }
@@ -159,8 +142,7 @@ void undelay_command(char *arg, struct session *ses)
     substitute_vars(left, temp);
     substitute_myvars(temp, left, ses);
 
-    if (!*left)
-    {
+    if (!*left) {
         tintin_eprintf(ses,"#ERROR: valid syntax is: #undelay {event pattern}");
         return;
     }
@@ -168,15 +150,13 @@ void undelay_command(char *arg, struct session *ses)
     flag = 0;
     ev = &(ses->events);
     while (*ev)
-        if (match(left, (*ev)->event))
-        {
+        if (match(left, (*ev)->event)) {
             flag=1;
             if (ses==activesession && ses->mesvar[3])
                 tintin_printf(ses, "#Ok. Event {%s} at %ld won't be executed.",
-                    (*ev)->event, (*ev)->time-time(0));
+                              (*ev)->event, (*ev)->time-time(0));
             remove_event(ev);
-        }
-        else
+        } else
             ev=&((*ev)->next);
 
     if (flag == 0)

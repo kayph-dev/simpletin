@@ -20,12 +20,10 @@ void show_hashlist(struct session *ses, struct hashtable *h, char *pat, const ch
 {
     struct listnode *templist;
 
-    if (!*pat)
-    {
+    if (!*pat) {
         tintin_printf(ses, msg_all);
         templist=hash2list(h, "*");
-    }
-    else
+    } else
         templist=hash2list(h, pat);
     show_list(templist);
     if (*pat && !templist->next)
@@ -38,23 +36,18 @@ void delete_hashlist(struct session *ses, struct hashtable *h, char *pat, const 
 {
     struct listnode *templist, *ln;
 
-    if (is_literal(pat))
-    {
-        if (delete_hash(h, pat))
-        {
+    if (is_literal(pat)) {
+        if (delete_hash(h, pat)) {
             if (msg_ok)
                 tintin_printf(ses, msg_ok, pat);
-        }
-        else
-        {
+        } else {
             if (msg_none)
                 tintin_printf(ses, msg_none, pat);
         }
         return;
     }
     templist=hash2list(h, pat);
-    for (ln=templist->next; ln; ln=ln->next)
-    {
+    for (ln=templist->next; ln; ln=ln->next) {
         if (msg_ok)
             tintin_printf(ses, msg_ok, ln->left);
         delete_hash(h, ln->left);
@@ -76,10 +69,8 @@ void alias_command(char *arg, struct session *ses)
     arg = get_arg_in_braces(arg, left, 0);
     arg = get_arg_in_braces(arg, right, 1);
 
-    if (*left && *right)
-    {
-        if ((ch=strchr(left, ' ')))
-        {
+    if (*left && *right) {
+        if ((ch=strchr(left, ' '))) {
             tintin_eprintf(ses, "#ERROR: aliases cannot contain spaces! Bad alias: {%s}", left);
             if (ch==left)
                 return;
@@ -93,8 +84,8 @@ void alias_command(char *arg, struct session *ses)
         return;
     }
     show_hashlist(ses, ses->aliases, left,
-        "#Defined aliases:",
-        "#No match(es) found for {%s}.");
+                  "#Defined aliases:",
+                  "#No match(es) found for {%s}.");
 }
 
 /************************/
@@ -106,6 +97,6 @@ void unalias_command(char *arg, struct session *ses)
 
     arg = get_arg_in_braces(arg, left, 1);
     delete_hashlist(ses, ses->aliases, left,
-        ses->mesvar[0]? "#Ok. {%s} is no longer an alias." : 0,
-        ses->mesvar[0]? "#No match(es) found for {%s}" : 0);
+                    ses->mesvar[0]? "#Ok. {%s} is no longer an alias." : 0,
+                    ses->mesvar[0]? "#No match(es) found for {%s}" : 0);
 }

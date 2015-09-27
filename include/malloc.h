@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_MALLOC_H__
+#define __SIMPLETIN_MALLOC_H__
+
 #include "kbtin_config.h"
 #ifdef HAVE_GLIB
 # include <glib.h>
@@ -19,3 +22,5 @@
 # define SFREE(x)       free(x) /* string */
 # define LFREE(x)       free(x) /* struct listnode */
 #endif
+
+#endif /* end of include guard: __SIMPLETIN_MALLOC_H__ */

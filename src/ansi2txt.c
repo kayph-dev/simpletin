@@ -3,17 +3,13 @@
 int main()
 {
     int ch;
-    do
-    {
+    do {
         if ((ch=getchar())=='\n')
             putchar('\n');
-        else
-        if ((ch>=32)&&(ch<127))
+        else if ((ch>=32)&&(ch<127))
             putchar(ch);
-        else
-        if (ch==27)
+        else if (ch==27)
             while (((ch=getchar())=='[')||(ch==',')||((ch>='0')&&(ch<='9'))||(ch==';'));
-    }
-    while (ch!=EOF);
+    } while (ch!=EOF);
     return 0;
 }

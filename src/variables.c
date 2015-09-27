@@ -60,31 +60,27 @@ void substitute_myvars(char *arg,char *result,struct session *ses)
     int specvar;
     int len=strlen(arg);
 
-    while (*arg)
-    {
+    while (*arg) {
 
-        if (*arg == '$')
-        {                           /* substitute variable */
+        if (*arg == '$') {
+            /* substitute variable */
             counter = 0;
             while (*(arg + counter) == '$')
                 counter++;
             varlen = 0;
 
             /* ${name} code added by Sverre Normann */
-            if (*(arg+counter) != DEFAULT_OPEN)
-            {
+            if (*(arg+counter) != DEFAULT_OPEN) {
                 /* ordinary variable which name contains no spaces and special characters  */
                 specvar = FALSE;
                 while (isalpha(*(arg+varlen+counter))||
-                       (*(arg+varlen+counter)=='_')||
-                       isdigit(*(arg+varlen+counter)))
+                        (*(arg+varlen+counter)=='_')||
+                        isdigit(*(arg+varlen+counter)))
                     varlen++;
                 if (varlen>0)
                     strncpy(varname,arg+counter,varlen);
                 *(varname + varlen) = '\0';
-            }
-            else
-            {
+            } else {
                 /* variable with name containing non-alpha characters e.g ${a b} */
                 specvar = TRUE;
                 get_arg_in_braces(arg + counter, varname, 0);
@@ -95,17 +91,13 @@ void substitute_myvars(char *arg,char *result,struct session *ses)
 
             if (specvar) varlen += 2; /* 2*DELIMITERS e.g. {} */
 
-            if (counter == nest + 1)
-            {
-                if ((v=get_hash(ses->myvars, varname)))
-                {
+            if (counter == nest + 1) {
+                if ((v=get_hash(ses->myvars, varname))) {
                     valuelen = strlen(v);
-                    if ((len+=valuelen-counter-varlen) > BUFFER_SIZE-10)
-                    {
-                        if (!aborting)
-                        {
+                    if ((len+=valuelen-counter-varlen) > BUFFER_SIZE-10) {
+                        if (!aborting) {
                             tintin_eprintf(ses,"#ERROR: command+variables too long while substituting $%s%s%s.",
-                                specvar?"{":"",varname,specvar?"}":"");
+                                           specvar?"{":"",varname,specvar?"}":"");
                             aborting=1;
                         }
                         len-=valuelen-counter-varlen;
@@ -114,72 +106,50 @@ void substitute_myvars(char *arg,char *result,struct session *ses)
                     strcpy(result, v);
                     result += valuelen;
                     arg += counter + varlen;
-                }
-                else
-                {
+                } else {
                     /* secstotick code added by Sverre Normann */
                     if (strcmp(varname,"secstotick")==0)
                         sprintf(value,"%d",timetilltick(ses));
-                    else
-                    if (strcmp(varname,"LINES")==0)
+                    else if (strcmp(varname,"LINES")==0)
                         sprintf(value,"%d",LINES);
-                    else
-                    if (strcmp(varname,"COLS")==0)
+                    else if (strcmp(varname,"COLS")==0)
                         sprintf(value,"%d",COLS);
-                    else
-                    if (strcmp(varname,"PATH")==0)
+                    else if (strcmp(varname,"PATH")==0)
                         path2var(value,ses);
-                    else
-                    if (strcmp(varname,"IDLETIME")==0)
+                    else if (strcmp(varname,"IDLETIME")==0)
                         sprintf(value,"%ld", (long int)(time(0)-ses->idle_since));
-                    else
-                    if (_ && (strcmp(varname,"LINE")==0 ||
-                        strcmp(varname,"_")==0))
+                    else if (_ && (strcmp(varname,"LINE")==0 ||
+                                   strcmp(varname,"_")==0))
                         strcpy(value,_);
-                    else
-                    if (strcmp(varname,"SESSION")==0)
+                    else if (strcmp(varname,"SESSION")==0)
                         strcpy(value,ses->name);
-                    else
-                    if (strcmp(varname,"SESSIONS")==0)
+                    else if (strcmp(varname,"SESSIONS")==0)
                         seslist(value);
-                    else
-                    if (strcmp(varname,"ASESSION")==0)
+                    else if (strcmp(varname,"ASESSION")==0)
                         strcpy(value,activesession->name);
-                    else
-                    if (strcmp(varname,"LOGFILE")==0)
+                    else if (strcmp(varname,"LOGFILE")==0)
                         strcpy(value,ses->logfile?ses->logname:"");
-                    else
-                    if (strcmp(varname,"_random")==0)
+                    else if (strcmp(varname,"_random")==0)
                         sprintf(value,"%d", rand());
-                    else
-                    if (strcmp(varname,"_time")==0 || strcmp(varname,"time")==0)
+                    else if (strcmp(varname,"_time")==0 || strcmp(varname,"time")==0)
                         sprintf(value,"%ld", (long int)time0);
-                    else
-                    if (strcmp(varname,"_clock")==0)
+                    else if (strcmp(varname,"_clock")==0)
                         sprintf(value,"%ld", (long int)time(0));
-                    else
-                    if (strcmp(varname,"_msec")==0)
-                    {
+                    else if (strcmp(varname,"_msec")==0) {
                         struct timeval tv;
                         gettimeofday(&tv, 0);
                         sprintf(value,"%ld", (long int)((tv.tv_sec-time0)*1000+(tv.tv_usec-utime0)/1000));
-                    }
-                    else
-                    if (strcmp(varname,"HOME")==0)
-                    {
+                    } else if (strcmp(varname,"HOME")==0) {
                         v=getenv("HOME");
                         if (v)
                             snprintf(value, BUFFER_SIZE, "%s", v);
                         else
                             *value=0;
-                    }
-                    else
+                    } else
                         goto novar;
                     valuelen=strlen(value);
-                    if ((len+=valuelen-counter-varlen) > BUFFER_SIZE-10)
-                    {
-                        if (!aborting)
-                        {
+                    if ((len+=valuelen-counter-varlen) > BUFFER_SIZE-10) {
+                        if (!aborting) {
                             tintin_eprintf(ses,"#ERROR: command+variables too long while substituting $%s.",varname);
                             aborting=1;
                         }
@@ -191,32 +161,23 @@ void substitute_myvars(char *arg,char *result,struct session *ses)
                     arg += counter + varlen;
                     /* secstotick code end */
                 } /* end if ...searchnode... */
-            }
-            else
-            {
+            } else {
 novar:
                 strncpy(result, arg, counter + varlen);
                 result += varlen + counter;
                 arg += varlen + counter;
             }
-        }
-        else if (*arg == DEFAULT_OPEN)
-        {
+        } else if (*arg == DEFAULT_OPEN) {
             nest++;
             *result++ = *arg++;
-        }
-        else if (*arg == DEFAULT_CLOSE)
-        {
+        } else if (*arg == DEFAULT_CLOSE) {
             nest--;
             *result++ = *arg++;
-        }
-        else if (*arg == '\\' && *(arg + 1) == '$' && nest == 0)
-        {
+        } else if (*arg == '\\' && *(arg + 1) == '$' && nest == 0) {
             arg++;
             *result++ = *arg++;
             len--;
-        }
-        else
+        } else
             *result++ = *arg++;
     }
 
@@ -236,14 +197,13 @@ void variable_command(char *arg,struct session *ses)
     arg = get_arg(arg, left, 0,ses);
     r=*space_out(arg);
     arg = get_arg(arg, right, 1,ses);
-    if (*left && r)
-    {
+    if (*left && r) {
         set_variable(left,right,ses);
         return;
     }
     show_hashlist(ses, ses->myvars, left,
-        "#THESE VARIABLES HAVE BEEN SET:",
-        "#THAT VARIABLE IS NOT DEFINED.");
+                  "#THESE VARIABLES HAVE BEEN SET:",
+                  "#THAT VARIABLE IS NOT DEFINED.");
 }
 
 /**********************/
@@ -255,8 +215,8 @@ void unvariable_command(char *arg,struct session *ses)
 
     arg = get_arg(arg, left, 1, ses);
     delete_hashlist(ses, ses->myvars, left,
-        ses->mesvar[5]? "#Ok. $%s is no longer a variable." : 0,
-        ses->mesvar[5]? "#THAT VARIABLE (%s) IS NOT DEFINED." : 0);
+                    ses->mesvar[5]? "#Ok. $%s is no longer a variable." : 0,
+                    ses->mesvar[5]? "#THAT VARIABLE (%s) IS NOT DEFINED." : 0);
 }
 
 
@@ -273,19 +233,17 @@ void unvariable_command(char *arg,struct session *ses)
 void listlength_command(char *arg,struct session *ses)
 {
     char left[BUFFER_SIZE], list[BUFFER_SIZE],
-    temp[BUFFER_SIZE];
+         temp[BUFFER_SIZE];
     int  i;
 
     arg = get_arg(arg, left,0,ses);
     if (!*left)
         tintin_eprintf(ses,"#Error - Syntax: #listlength {dest var} {list}");
-    else
-    {
+    else {
         get_arg(arg, list, 1, ses);
         arg = list;
         i=0;
-        do
-        {
+        do {
             if (*arg) i++;
             arg = get_arg_in_braces(arg, temp, 0);
         } while (*arg);
@@ -343,8 +301,7 @@ void finditem_command(char *arg,struct session *ses)
     arg = get_arg(arg, list,1,ses);
     if (!*left)
         tintin_eprintf(ses,"#Error - Syntax: #finditem {dest var} {item} {list}");
-    else
-    {
+    else {
         sprintf(item,"%d",find_item(item,list));
         set_variable(left,item,ses);
     }
@@ -377,27 +334,22 @@ int finditem_inline(char *arg,struct session *ses)
 void getitem_command(char *arg,struct session *ses)
 {
     char destvar[BUFFER_SIZE], itemnrtxt[BUFFER_SIZE],
-    list[BUFFER_SIZE], temp1[BUFFER_SIZE];
+         list[BUFFER_SIZE], temp1[BUFFER_SIZE];
     int  i, itemnr;
 
     arg = get_arg(arg, destvar, 0, ses);
     arg = get_arg(arg, itemnrtxt, 0, ses);
 
-    if (!*destvar || !*itemnrtxt)
-    {
+    if (!*destvar || !*itemnrtxt) {
         tintin_eprintf(ses,"#Error - Syntax: #getitem {destination variable} {item number} {list}");
-    }
-    else
-    {
+    } else {
         if (sscanf(itemnrtxt,"%d",&itemnr) != 1)
             tintin_eprintf(ses,"#Error in #getitem - expected a _number_ as item number, got {%s}.",itemnrtxt);
-        else
-        {
+        else {
             get_arg(arg, list, 1, ses);
             arg = list;
             i=0;
-            if (itemnr>0)
-            {
+            if (itemnr>0) {
                 do {
                     arg = get_arg_in_braces(arg, temp1, 0);
                     i++;
@@ -405,8 +357,7 @@ void getitem_command(char *arg,struct session *ses)
 
                 if (*temp1)
                     set_variable(destvar,temp1,ses);
-                else
-                {
+                else {
                     set_variable(destvar,"",ses);
                     if (ses->mesvar[5])
                         tintin_printf(ses,"#Item doesn't exist!");
@@ -464,8 +415,7 @@ void isatom_command(char *line,struct session *ses)
     int i;
 
     line = get_arg(line, left, 0, ses);
-    if (!*left)
-    {
+    if (!*left) {
         tintin_eprintf(ses,"#Syntax: #isatom <dest. var> <list>");
         return;
     };
@@ -530,16 +480,15 @@ static char* get_split_pos(char *list, int head_length)
     if ( list[0] == '\0' ) /* empty string */
         return list;
 
-    if (head_length > 0)
-    { /* modified #getitemnr code */
+    if (head_length > 0) {
+        /* modified #getitemnr code */
         do {
             list = get_arg_in_braces(list, temp, STOP_AT_SPACES);
             i++;
         } while (i != head_length);
 
         return list;
-    }
-    else /* head_length == 0 */
+    } else /* head_length == 0 */
         return list;
 }
 
@@ -565,16 +514,13 @@ static int is_braced_atom_2(char *beg,char *end,struct session *ses)
     if (*beg!=DEFAULT_OPEN)
         return FALSE;
 
-    while (NOT_AT_END(beg,end) && !(*beg == DEFAULT_CLOSE && nest == 0))
-    {
+    while (NOT_AT_END(beg,end) && !(*beg == DEFAULT_CLOSE && nest == 0)) {
         if (*beg=='\\') /* next element is taken verbatim i.e. as is */
             beg++;
-        else
-            if (*beg == DEFAULT_OPEN)
-                nest++;
-            else
-                if (*beg == DEFAULT_CLOSE)
-                    nest--;
+        else if (*beg == DEFAULT_OPEN)
+            nest++;
+        else if (*beg == DEFAULT_CLOSE)
+            nest--;
 
         if (NOT_AT_END(beg,end)) /* in case '\\' is the last character */
             beg++;
@@ -585,8 +531,7 @@ static int is_braced_atom_2(char *beg,char *end,struct session *ses)
 
     /* we can check only if there are too many opening delimiters */
     /* this should not happen anyway */
-    if (nest > 0)
-    {
+    if (nest > 0) {
         tintin_eprintf(ses,"Unmatched braces error - too many '%c'",DEFAULT_OPEN);
         return FALSE;
     }
@@ -621,8 +566,7 @@ static void simplify_list(char **beg, char **end, int flag, struct session *ses)
 
 #ifdef REMOVE_ONEELEM_BRACES
     /* removing unnecessary braces (one pair at most) */
-    if (flag&&is_braced_atom_2((*beg),(*end),ses))
-    {
+    if (flag&&is_braced_atom_2((*beg),(*end),ses)) {
         (*beg)++;
         (*end)--;
     }
@@ -656,8 +600,7 @@ static void split_list(char *head,char *tail,char *list,int head_length,struct s
     char *headbeg, *headend;
     char *tailbeg, *tailend;
 
-    if (!*list)
-    {
+    if (!*list) {
         head[0] = tail[0] = '\0';
         return;
     }
@@ -694,31 +637,26 @@ void splitlist_command(char *arg,struct session *ses)
     arg = get_arg(arg, headvar, 0, ses);
     arg = get_arg(arg, tailvar, 0, ses);
 
-    if (!*headvar && !*tailvar)
-    {
+    if (!*headvar && !*tailvar) {
         tintin_eprintf(ses,"#Error - Syntax: #splitlist {head variable} {tail variable} "
-                     "{list} [{head size}]");
+                       "{list} [{head size}]");
         return; /* on ERROR */
     }
 
     arg = get_arg(arg, list, 1, ses);
     arg = get_arg(arg, headlengthtxt, 1, ses);
 
-    if (!*headlengthtxt)
-    {
+    if (!*headlengthtxt) {
         /* defaults number of elements in head to 1 if no value given */
-        headlengthtxt[0] = '1'; headlengthtxt[1] = '\0';
+        headlengthtxt[0] = '1';
+        headlengthtxt[1] = '\0';
         head_length = 1;
-    }
-    else
-    {
-        if (sscanf(headlengthtxt,"%d",&head_length) != 1)
-        {
+    } else {
+        if (sscanf(headlengthtxt,"%d",&head_length) != 1) {
             tintin_eprintf(ses,"#Error in #splitlist - head size has to be number>=0, got {%s}.",headlengthtxt);
             return; /* on ERROR */
         }
-        if (head_length < 0)
-        {
+        if (head_length < 0) {
             tintin_eprintf(ses,"#Error in #splitlist - head size could not be negative, got {%d}.",head_length);
             return; /* on ERROR */
         }
@@ -740,13 +678,12 @@ void splitlist_command(char *arg,struct session *ses)
 void deleteitems_command(char *arg,struct session *ses)
 {
     char left[BUFFER_SIZE], list[BUFFER_SIZE], item[BUFFER_SIZE],
-    temp[BUFFER_SIZE], right[BUFFER_SIZE], *lpos, *rpos;
+         temp[BUFFER_SIZE], right[BUFFER_SIZE], *lpos, *rpos;
 
     arg = get_arg(arg, left,0,ses);
     if (!*left)
         tintin_eprintf(ses,"#Error - Syntax: #deleteitem {dest. variable} {list} {item}");
-    else
-    {
+    else {
         arg=get_arg(arg, list, 0, ses);
         get_arg(arg,item,1,ses);
         arg = list;
@@ -754,16 +691,14 @@ void deleteitems_command(char *arg,struct session *ses)
         if (*arg)
             do {
                 arg = get_arg_in_braces(arg, temp, 0);
-                if (!match(item,temp))
-                {
+                if (!match(item,temp)) {
                     if (rpos!=right)
                         *rpos++=' ';
                     lpos=temp;
                     if (isatom(temp))
                         while (*lpos)
                             *rpos++=*lpos++;
-                    else
-                    {
+                    else {
                         *rpos++=DEFAULT_OPEN;
                         while (*lpos)
                             *rpos++=*lpos++;
@@ -787,19 +722,17 @@ struct session *foreach_command(char *arg,struct session *ses)
 
     arg=get_arg(arg, left, 0, ses);
     get_arg_in_braces(arg,right,1);
-    if (!*right)
-    {
+    if (!*right) {
         tintin_eprintf(ses,"#SYNTAX: foreach {list} command");
         return ses;
     }
     lastvars=pvars;
     pvars=&vars;
     list = left;
-    while (*list)
-    {
+    while (*list) {
         list = get_arg_in_braces(list, temp, 0);
         strcpy(vars[0], p=temp);
-        for (i=1;i<10;i++)
+        for (i=1; i<10; i++)
             p=get_arg_in_braces(p, vars[i], 0);
         in_alias=1;
         ses=parse_input(right,1,ses);
@@ -829,23 +762,20 @@ void sortlist_command(char *arg,struct session *ses)
 
     arg=get_arg(arg, left, 0, ses);
     get_arg(arg,right,1,ses);
-    if (!*left)
-    {
+    if (!*left) {
         tintin_eprintf(ses,"#SYNTAX: sortlist var {list}");
         return;
     }
 
     n=0;
     list = right;
-    while (*list)
-    {
+    while (*list) {
         list = get_arg_in_braces(list, temp, 0);
         tab[n++]=mystrdup(temp);
     };
     qsort(tab,n,sizeof(char*),compar);
     list=temp;
-    for (i=0;i<n;i++)
-    {
+    for (i=0; i<n; i++) {
         if (list!=temp)
             *list++=' ';
         if (*tab[i]&&isatom(tab[i]))
@@ -869,8 +799,7 @@ void tolower_command(char *arg,struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*left)
         tintin_eprintf(ses,"#Syntax: #tolower <var> <text>");
-    else
-    {
+    else {
         TO_WC(txt, right);
         for (p = txt; *p; p++)
             *p = towlower(*p);
@@ -891,8 +820,7 @@ void toupper_command(char *arg,struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*left)
         tintin_eprintf(ses,"#Syntax: #toupper <var> <text>");
-    else
-    {
+    else {
         TO_WC(txt, right);
         for (p = txt; *p; p++)
             *p = towupper(*p);
@@ -913,8 +841,7 @@ void firstupper_command(char *arg,struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*left)
         tintin_eprintf(ses,"#Syntax: #firstupper <var> <text>");
-    else
-    {
+    else {
         TO_WC(txt, right);
         for (p = txt; *p; p++)
             *p = towlower(*p);
@@ -935,8 +862,7 @@ void strlen_command(char *arg, struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*left)
         tintin_eprintf(ses,"#Syntax: #strlen <var> <text>");
-    else
-    {
+    else {
         sprintf(right, "%d", FLATlen(right));
         set_variable(left,right,ses);
     }
@@ -994,8 +920,7 @@ void reverse_command(char *arg,struct session *ses)
 
     if (!*destvar)
         tintin_eprintf(ses,"#Error - Syntax: #reverse {destination variable} {string}");
-    else
-    {
+    else {
         TO_WC(origstring, strvar);
         revstr(revstring, origstring);
         WRAP_WC(strvar, revstring);
@@ -1018,12 +943,10 @@ void explode_command(char *arg, struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*left || !*del)
         tintin_eprintf(ses,"#Syntax: #explode <var> <delimiter> <text>");
-    else
-    {
+    else {
         r=res;
         p=right;
-        while ((n=strstr(p,del)))
-        {
+        while ((n=strstr(p,del))) {
             *n=0;
             if (p!=right)
                 *r++=' ';
@@ -1040,8 +963,7 @@ void explode_command(char *arg, struct session *ses)
         else
             r+=sprintf(r, "{%s}", p);
 
-        if (strlen(res)>BUFFER_SIZE-10)
-        {
+        if (strlen(res)>BUFFER_SIZE-10) {
             tintin_eprintf(ses,"#ERROR: exploded line too long in #explode {%s} {%s} {%s}",left,del,right);
             res[BUFFER_SIZE-10]=0;
         }
@@ -1064,17 +986,14 @@ void implode_command(char *arg, struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*left || !*del)
         tintin_eprintf(ses,"#Syntax: #implode <var> <delimiter> <list>");
-    else
-    {
+    else {
         dellen=strlen(del);
         p = get_arg_in_braces(right, res, 0);
         r=strchr(res,0);
         len=r-res;
-        while (*p)
-        {
+        while (*p) {
             p = get_arg_in_braces(p, temp, 0);
-            if ((len+=strlen(temp)+dellen) > BUFFER_SIZE-10)
-            {
+            if ((len+=strlen(temp)+dellen) > BUFFER_SIZE-10) {
                 tintin_eprintf(ses,"#ERROR: imploded line too long in #implode {%s} {%s} {%s}",left,del,right);
                 break;
             }
@@ -1097,15 +1016,13 @@ void collate_command(char *arg,struct session *ses)
     arg = get_arg(arg, left,0,ses);
     if (!*left)
         tintin_eprintf(ses,"#Error - Syntax: #collate {dest var} {list}");
-    else
-    {
+    else {
         strcpy(last, K_ACTION_MAGIC);
         *(outptr=out)=0;
         get_arg(arg, list, 1, ses);
         arg = list;
         i=0;
-        while (*arg)
-        {
+        while (*arg) {
             arg=space_out(arg);
             if (isdigit(*arg))
                 j=strtol(arg, &arg, 10);
@@ -1114,19 +1031,14 @@ void collate_command(char *arg,struct session *ses)
             if (!*arg || *arg==' ')
                 continue;
             arg = get_arg_in_braces(arg, cur, 0);
-            if (j)
-            {
-                if (strcmp(cur,last))
-                {
-                    if (isatom(last))
-                    {
+            if (j) {
+                if (strcmp(cur,last)) {
+                    if (isatom(last)) {
                         if (i>1)
                             outptr+=sprintf(outptr,"%d",i);
                         if (i)
                             outptr+=sprintf(outptr,"%s ",last);
-                    }
-                    else
-                    {
+                    } else {
                         if (i>1)
                             outptr+=sprintf(outptr,"%d",i);
                         if (i)
@@ -1134,20 +1046,16 @@ void collate_command(char *arg,struct session *ses)
                     }
                     strcpy(last, cur);
                     i=j;
-                }
-                else
+                } else
                     i+=j;
-             }
+            }
         };
-        if (isatom(last))
-        {
+        if (isatom(last)) {
             if (i>1)
                 outptr+=sprintf(outptr,"%d",i);
             if (i)
                 outptr+=sprintf(outptr,"%s",last);
-        }
-        else
-        {
+        } else {
             if (i>1)
                 outptr+=sprintf(outptr,"%d",i);
             if (i)
@@ -1170,14 +1078,12 @@ void expand_command(char *arg,struct session *ses)
     arg = get_arg(arg, left,0,ses);
     if (!*left)
         tintin_eprintf(ses,"#Error - Syntax: #expand {dest var} {list}");
-    else
-    {
+    else {
         *(outptr=out)=0;
         get_arg(arg, list, 1, ses);
         arg = list;
         i=0;
-        while (*arg)
-        {
+        while (*arg) {
             arg=space_out(arg);
             if (isdigit(*arg))
                 j=strtol(arg, &arg, 10);
@@ -1187,15 +1093,13 @@ void expand_command(char *arg,struct session *ses)
                 continue;
             arg = get_arg_in_braces(arg, cur, 0);
             if (j>BUFFER_SIZE/2)
-                    j=BUFFER_SIZE/2;
-            for (i=0;i<j;i++)
-            {
+                j=BUFFER_SIZE/2;
+            for (i=0; i<j; i++) {
                 if (isatom(cur))
                     outptr+=snprintf(outptr, out+BUFFER_SIZE-outptr, " %s", cur);
                 else
                     outptr+=snprintf(outptr, out+BUFFER_SIZE-outptr, " {%s}", cur);
-                if (outptr>=out+BUFFER_SIZE-1)
-                {
+                if (outptr>=out+BUFFER_SIZE-1) {
                     tintin_eprintf(ses, "#ERROR: expanded line too long in {%s}", list);
                     return;
                 }
@@ -1218,16 +1122,13 @@ void random_command(char *arg,struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*left || !*right)
         tintin_eprintf(ses,"#Syntax: #random <var> <low,high>");
-    else
-    {
+    else {
         if (sscanf(right, "%d,%d%c", &low, &high, &dummy) != 2)
             tintin_eprintf(ses,"#Wrong number of range arguments in #random: got {%s}.",right);
         else if (low < 0 || high < 0)
             tintin_eprintf(ses,"#Both arguments of range in #random should be >0, got %d,%d.",low,high);
-        else
-        {
-            if (low > high)
-            {
+        else {
+            if (low > high) {
                 number = low;
                 low = high, high = number;
             };
@@ -1249,16 +1150,13 @@ int random_inline(char *arg, struct session *ses)
     arg = get_arg(arg, right, 1, ses);
     if (!*right)
         tintin_eprintf(ses,"#Syntax: #random <low,high>");
-    else
-    {
+    else {
         if (sscanf(right, "%d,%d", &low, &high) != 2)
             tintin_eprintf(ses,"#Wrong number of range arguments in #random: got {%s}.",right);
         else if (low < 0 || high < 0)
             tintin_eprintf(ses,"#Both arguments of range in #random should be >0, got %d,%d.",low,high);
-        else
-        {
-            if (low > high)
-            {
+        else {
+            if (low > high) {
                 tmp = low;
                 low = high, high = tmp;
             };
@@ -1276,8 +1174,7 @@ static int cutws(WC *str, int len, WC **rstr)
     int w,s;
 
     s=0;
-    while (*str)
-    {
+    while (*str) {
         w=wcwidth(*str);
         if (w<0)
             w=0;
@@ -1309,12 +1206,10 @@ void postpad_command(char *arg,struct session *ses)
 
     if (!*lengthstr)
         tintin_eprintf(ses,"#Error - Syntax: #postpad {dest var} {length} {text}");
-    else
-    {
+    else {
         if (!sscanf(lengthstr,"%d",&length) || (length < 1) || (length > BUFFER_SIZE-10))
             tintin_eprintf(ses,"#Error in #postpad - length has to be a positive number >0, got {%s}.",lengthstr);
-        else
-        {
+        else {
             TO_WC(bstr, astr);
             len=cutws(bstr, length, &bptr);
             aptr=astr+wc_to_utf8(astr, bstr, bptr-bstr, BUFFER_SIZE-3);
@@ -1348,12 +1243,10 @@ void prepad_command(char *arg,struct session *ses)
 
     if (!*lengthstr)
         tintin_eprintf(ses,"#Error - Syntax: #prepad {dest var} {length} {text}");
-    else
-    {
+    else {
         if (!sscanf(lengthstr,"%d",&length) || (length < 1) || (length>BUFFER_SIZE-10))
             tintin_eprintf(ses,"#Error in #prepad - length has to be a positive number >0, got {%s}.",lengthstr);
-        else
-        {
+        else {
             TO_WC(bstr, astr);
             len=cutws(bstr, length, &bptr);
             aptr=astr;
@@ -1376,29 +1269,26 @@ static int time2secs(char *tt,struct session *ses)
     char *oldtt;
     int w,t=0;
 
-    if (!*tt)
-    {
+    if (!*tt) {
 bad:
         tintin_eprintf(ses,"#time format should be: <#y[ears][,] #w #d #h #m [and] #[s]> or just <#> of seconds.");
         tintin_eprintf(ses,"#got: {%s}.",tt);
         return INVALID_TIME;
     };
     t=0;
-    for (;;)
-    {
+    for (;;) {
         w=strtol(oldtt=tt,&tt,10);
         if (tt==oldtt)
             goto bad;
         while (*tt==' ')
             tt++;
-        switch (tolower(*tt))
-        {
+        switch (tolower(*tt)) {
         case 'w':
             w*=7;
             goto day;
         case 'y':
             w*=365;
-        day:
+day:
         case 'd':
             w*=24;
         case 'h':
@@ -1439,15 +1329,13 @@ void ctime_command(char *arg,struct session *ses)
     if (*arg2)
         if ((tt=time2secs(arg2,ses))==INVALID_TIME)
             return;
-        else
-            {}
+        else {
+        }
     else
         tt=time(0);
     p = ct = ctime(&tt);
-    while (p && *p)
-    {
-        if (*p == '\n')
-        {
+    while (p && *p) {
+        if (*p == '\n') {
             *p = '\0';
             break;
         }
@@ -1468,14 +1356,12 @@ void time_command(char *arg,struct session *ses)
 
     arg = get_arg(arg, left, 0, ses);
     arg = get_arg(arg, ct, 1, ses);
-    if (*ct)
-    {
+    if (*ct) {
         int t=time2secs(ct,ses);
         if (t==INVALID_TIME)
             return;
         sprintf(ct,"%d",t);
-    }
-    else
+    } else
         sprintf(ct,"%d",(int)time(0));
     if (!*left)
         tintin_printf(ses, "#%s.", ct);
@@ -1494,20 +1380,18 @@ void localtime_command(char *arg,struct session *ses)
 
     arg = get_arg(arg, left, 0, ses);
     arg = get_arg(arg, ct, 1, ses);
-    if (*ct)
-    {
+    if (*ct) {
         t=time2secs(ct,ses);
         if (t==INVALID_TIME)
             return;
         sprintf(ct, "%ld", (long)t);
-    }
-    else
+    } else
         t=time(0);
     localtime_r(&t, &ts);
     sprintf(ct, "%02d %02d %02d  %02d %02d %04d  %d %d %d",
-                    ts.tm_sec, ts.tm_min, ts.tm_hour,
-                    ts.tm_mday, ts.tm_mon+1, ts.tm_year+1900,
-                    ts.tm_wday, ts.tm_yday+1, ts.tm_isdst);
+            ts.tm_sec, ts.tm_min, ts.tm_hour,
+            ts.tm_mday, ts.tm_mon+1, ts.tm_year+1900,
+            ts.tm_wday, ts.tm_yday+1, ts.tm_isdst);
     if (!*left)
         tintin_printf(ses, "#%s.", ct);
     else
@@ -1525,20 +1409,18 @@ void gmtime_command(char *arg,struct session *ses)
 
     arg = get_arg(arg, left, 0, ses);
     arg = get_arg(arg, ct, 1, ses);
-    if (*ct)
-    {
+    if (*ct) {
         t=time2secs(ct,ses);
         if (t==INVALID_TIME)
             return;
         sprintf(ct, "%ld", (long)t);
-    }
-    else
+    } else
         t=time(0);
     gmtime_r(&t, &ts);
     sprintf(ct, "%02d %02d %02d  %02d %02d %04d  %d %d %d",
-                    ts.tm_sec, ts.tm_min, ts.tm_hour,
-                    ts.tm_mday, ts.tm_mon+1, ts.tm_year+1900,
-                    ts.tm_wday, ts.tm_yday+1, ts.tm_isdst);
+            ts.tm_sec, ts.tm_min, ts.tm_hour,
+            ts.tm_mday, ts.tm_mon+1, ts.tm_year+1900,
+            ts.tm_wday, ts.tm_yday+1, ts.tm_isdst);
     if (!*left)
         tintin_printf(ses, "#%s.", ct);
     else
@@ -1568,14 +1450,12 @@ void substring_command(char *arg,struct session *ses)
 
     if (!*left || (p==mid) || (*p) || (r<0))
         tintin_eprintf(ses, "#SYNTAX: substr <var> <l>[,<r>] <string>");
-    else
-    {
+    else {
         p=mid;
         TO_WC(buf, right);
         lptr=buf;
         s=1;
-        while (*lptr)
-        {
+        while (*lptr) {
             w=wcwidth(*lptr);
             if (w<0)
                 w=0;
@@ -1587,8 +1467,7 @@ void substring_command(char *arg,struct session *ses)
         if (s>l)
             *p++=' ';   /* the left edge is cut in half */
         rptr=lptr;
-        while (w=wcwidth(*rptr), *rptr)
-        {
+        while (w=wcwidth(*rptr), *rptr) {
             if (w<0)
                 w=0;
             if (w && s+w>r+1)
@@ -1616,24 +1495,18 @@ struct session *strcmp_command(char *line, struct session *ses)
     line = get_arg(line, right, 0, ses);
     line = get_arg_in_braces(line, cmd, 1);
 
-    if (!*cmd)
-    {
+    if (!*cmd) {
         tintin_eprintf(ses, "#Syntax: #strcmp <a> <b> <command> [#else <command>]");
         return ses;
     }
 
-    if (!strcmp(left,right))
-    {
+    if (!strcmp(left,right)) {
         ses=parse_input(cmd,1,ses);
-    }
-    else
-    {
+    } else {
         line = get_arg_in_braces(line, left, 0);
-        if (*left == tintin_char)
-        {
+        if (*left == tintin_char) {
 
-            if (is_abrev(left + 1, "else"))
-            {
+            if (is_abrev(left + 1, "else")) {
                 line = get_arg_in_braces(line, right, 1);
                 ses=parse_input(right,1,ses);
             }
@@ -1677,22 +1550,18 @@ struct session *ifexists_command(char *line, struct session *ses)
     line = get_arg(line, left, 0, ses);
     line = get_arg_in_braces(line, cmd, 1);
 
-    if (!*cmd)
-    {
+    if (!*cmd) {
         tintin_eprintf(ses, "#Syntax: #ifexists <varname> <command> [#else <command>]");
         return ses;
     }
 
     if (get_hash(ses->myvars,left))
         ses=parse_input(cmd,1,ses);
-    else
-    {
+    else {
         line = get_arg_in_braces(line, left, 0);
-        if (*left == tintin_char)
-        {
+        if (*left == tintin_char) {
 
-            if (is_abrev(left + 1, "else"))
-            {
+            if (is_abrev(left + 1, "else")) {
                 line = get_arg_in_braces(line, cmd, 1);
                 ses=parse_input(cmd,1,ses);
             }
@@ -1715,8 +1584,7 @@ void ctoi_command(char* arg, struct session* ses)
 
     if (!*left || !*right)
         tintin_eprintf(ses, "#Syntax: #ctoi <var> <text>");
-    else
-    {
+    else {
         ctoi(right);
         set_variable(left, right, ses);
     }

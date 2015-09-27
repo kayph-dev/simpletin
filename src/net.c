@@ -46,20 +46,19 @@ static char* afstr(int af)
 {
     static char msg[19];
 
-    switch (af)
-    {
-        case AF_INET:
-            return "IPv4";
-        case AF_INET6:
-            return "IPv6";
-        default:
-            /* No symbolic names for AF_UNIX, AF_IPX and the like.
-             * We would need separate autoconf checks just for them,
-             * and they don't support TCP anyway.  We probably should
-             * allow all SOCK_STREAM-capable transports, but I'm a bit
-             * unsure.  */
-            snprintf(msg, 19, "AF=%d", af);
-            return msg;
+    switch (af) {
+    case AF_INET:
+        return "IPv4";
+    case AF_INET6:
+        return "IPv6";
+    default:
+        /* No symbolic names for AF_UNIX, AF_IPX and the like.
+         * We would need separate autoconf checks just for them,
+         * and they don't support TCP anyway.  We probably should
+         * allow all SOCK_STREAM-capable transports, but I'm a bit
+         * unsure.  */
+        snprintf(msg, 19, "AF=%d", af);
+        return msg;
     }
 }
 
@@ -80,8 +79,7 @@ int connect_mud(char *host, char *port, struct session *ses)
     hints.ai_protocol=IPPROTO_TCP;
     hints.ai_flags=AI_ADDRCONFIG;
 
-    if ((err=getaddrinfo(host, port, &hints, &ai)))
-    {
+    if ((err=getaddrinfo(host, port, &hints, &ai))) {
         if (err==-2)
             tintin_eprintf(ses, "#Unknown host: {%s}", host);
         else
@@ -92,20 +90,17 @@ int connect_mud(char *host, char *port, struct session *ses)
     if (signal(SIGALRM, alarm_func) == BADSIG)
         syserr("signal SIGALRM");
 
-    for (addr=ai; addr; addr=addr->ai_next)
-    {
+    for (addr=ai; addr; addr=addr->ai_next) {
         tintin_printf(ses, "#Trying to connect... (%s) (charset=%s)",
-            afstr(addr->ai_family), ses->charset);
+                      afstr(addr->ai_family), ses->charset);
 
-        if ((sock=socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol))==-1)
-        {
+        if ((sock=socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol))==-1) {
             tintin_eprintf(ses, "#ERROR: %s", strerror(errno));
             continue;
         }
 
         val=IPTOS_LOWDELAY;
-        if (setsockopt(sock, IPPROTO_IP, IP_TOS, &val, sizeof(val)))
-        {
+        if (setsockopt(sock, IPPROTO_IP, IP_TOS, &val, sizeof(val))) {
             /*tintin_eprintf(ses, "#setsockopt: %s", strerror(errno))*/
             /* FIXME: BSD doesn't like this on IPv6 */
         }
@@ -119,18 +114,14 @@ int connect_mud(char *host, char *port, struct session *ses)
 
         abort_connect=0;
         alarm(15);
-    intr:
-        if ((connect(sock, addr->ai_addr, addr->ai_addrlen)))
-        {
-            switch (errno)
-            {
+intr:
+        if ((connect(sock, addr->ai_addr, addr->ai_addrlen))) {
+            switch (errno) {
             case EINTR:
-                if (abort_connect)
-                {
+                if (abort_connect) {
                     tintin_eprintf(ses, "#CONNECTION TIMED OUT");
                     continue;
-                }
-                else
+                } else
                     goto intr;
             default:
                 alarm(0);
@@ -157,12 +148,10 @@ int connect_mud(char *host, char *port, struct session *ses)
 
     if (isdigit(*host))         /* interpret host part */
         sockaddr.sin_addr.s_addr = inet_addr(host);
-    else
-    {
+    else {
         struct hostent *hp;
 
-        if ((hp = gethostbyname(host)) == NULL)
-        {
+        if ((hp = gethostbyname(host)) == NULL) {
             tintin_eprintf(ses, "#ERROR - UNKNOWN HOST: {%s}", host);
             return 0;
         }
@@ -171,8 +160,7 @@ int connect_mud(char *host, char *port, struct session *ses)
 
     if (isdigit(*port))
         sockaddr.sin_port = htons(atoi(port));  /* intepret port part */
-    else
-    {
+    else {
         tintin_eprintf(ses, "#THE PORT SHOULD BE A NUMBER (got {%s}).", port);
         return 0;
     }
@@ -194,11 +182,9 @@ int connect_mud(char *host, char *port, struct session *ses)
     val = connect(sock, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
     alarm(0);
 
-    if (val)
-    {
+    if (val) {
         close(sock);
-        switch (errno)
-        {
+        switch (errno) {
         case EINTR:
             tintin_eprintf(ses, "#CONNECTION TIMED OUT.");
             break;
@@ -234,23 +220,19 @@ void write_line_mud(char *line, struct session *ses)
 
     if (*line)
         ses->idle_since=time(0);
-    if (ses->issocket)
-    {
-        if (!ses->nagle)
-        {
+    if (ses->issocket) {
+        if (!ses->nagle) {
             setsockopt(ses->socket, IPPROTO_TCP, TCP_NODELAY, &ses->nagle,
-                sizeof(ses->nagle));
+                       sizeof(ses->nagle));
             ses->nagle=1;
         }
         PROFPUSH("conv: utf8->remote");
         convert(&ses->c_io, rstr, line, 1);
         PROFPOP;
         telnet_write_line(rstr, ses);
-    }
-    else if (ses==nullsession)
+    } else if (ses==nullsession)
         tintin_eprintf(ses, "#spurious output: %s", line);  /* CHANGE ME */
-    else
-    {
+    else {
         PROFPUSH("conv: utf8->remote");
         convert(&ses->c_io, rstr, line, 1);
         PROFPOP;
@@ -262,7 +244,7 @@ void write_line_mud(char *line, struct session *ses)
 void flush_socket(struct session *ses)
 {
     setsockopt(ses->socket, IPPROTO_TCP, TCP_NODELAY, &ses->nagle,
-        sizeof(ses->nagle));
+               sizeof(ses->nagle));
     ses->nagle=0;
 }
 
@@ -274,15 +256,12 @@ static int read_socket(struct session *ses, char *buffer, int len)
 #ifdef HAVE_GNUTLS
     int ret;
 
-    if (ses->ssl)
-    {
-        do
-        {
+    if (ses->ssl) {
+        do {
             ret=gnutls_record_recv(ses->ssl, buffer, len);
         } while (ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
         return ret;
-    }
-    else
+    } else
 #endif
         return read(ses->socket, buffer, len);
 }
@@ -292,14 +271,12 @@ int write_socket(struct session *ses, char *buffer, int len)
 #ifdef HAVE_GNUTLS
     int ret;
 
-    if (ses->ssl)
-    {
+    if (ses->ssl) {
         ret=gnutls_record_send(ses->ssl, buffer, len);
         while (ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN)
             ret=gnutls_record_send(ses->ssl, 0, 0);
         return ret;
-    }
-    else
+    } else
 #endif
         return write(ses->socket, buffer, len);
 }
@@ -314,8 +291,7 @@ int read_buffer_mud(char *buffer, struct session *ses)
 #define tmpbuf ses->telnet_buf
 #define len ses->telnet_buflen
 
-    if (!ses->issocket)
-    {
+    if (!ses->issocket) {
         didget=read(ses->socket, buffer, INPUT_CHUNK);
         if (didget<=0)
             return -1;
@@ -325,13 +301,10 @@ int read_buffer_mud(char *buffer, struct session *ses)
     }
 
 #ifdef HAVE_ZLIB
-    if (ses->mccp)
-    {
-        if (!ses->mccp_more)
-        {
+    if (ses->mccp) {
+        if (!ses->mccp_more) {
             didget = read_socket(ses, ses->mccp_buf, INPUT_CHUNK);
-            if (didget<=0)
-            {
+            if (didget<=0) {
                 ses->mccp_more=0;
                 return -1;
             }
@@ -340,8 +313,7 @@ int read_buffer_mud(char *buffer, struct session *ses)
         }
         ses->mccp->next_out = (Bytef*)(tmpbuf+len);
         ses->mccp->avail_out = INPUT_CHUNK-len;
-        switch (i=inflate(ses->mccp, Z_SYNC_FLUSH))
-        {
+        switch (i=inflate(ses->mccp, Z_SYNC_FLUSH)) {
         case Z_OK:
             didget=INPUT_CHUNK-len-ses->mccp->avail_out;
             ses->mccp_more = !ses->mccp->avail_out;
@@ -366,16 +338,12 @@ int read_buffer_mud(char *buffer, struct session *ses)
             ses->mccp_more=0;
             return -1;
         }
-    }
-    else
+    } else
 #endif
     {
         didget = read_socket(ses, tmpbuf+len, INPUT_CHUNK-len);
 
-        if (didget < 0)
-            return -1;
-
-        else if (didget == 0)
+        if (didget <= 0)
             return -1;
     }
 
@@ -395,10 +363,8 @@ int read_buffer_mud(char *buffer, struct session *ses)
     cpsource = tmpbuf;
     cpdest = buffer;
     i = didget;
-    while (i > 0)
-    {
-        switch (*(unsigned char *)cpsource)
-        {
+    while (i > 0) {
+        switch (*(unsigned char *)cpsource) {
         case 0:
             i--;
             didget--;
@@ -406,8 +372,7 @@ int read_buffer_mud(char *buffer, struct session *ses)
             break;
         case 255:
             b=do_telnet_protocol(cpsource, i, ses);
-            switch (b)
-            {
+            switch (b) {
             case -1:
                 len=i;
                 memmove(tmpbuf, cpsource, i);
@@ -465,8 +430,7 @@ static int init_mccp(struct session *ses, int cplen, char *cpsrc)
     ses->mccp->zfree     = 0;
     ses->mccp->opaque    = NULL;
 
-    if (inflateInit(ses->mccp) != Z_OK)
-    {
+    if (inflateInit(ses->mccp) != Z_OK) {
         tintin_eprintf(ses, "#FAILED TO INITIALIZE MCCP2.");
         /* Unrecoverable */
         TFREE(ses->mccp, z_stream);

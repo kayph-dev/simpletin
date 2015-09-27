@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(kbtin)
+project(simpletin)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
@@ -14,4 +14,3 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb")
 
 add_subdirectory(src)
-

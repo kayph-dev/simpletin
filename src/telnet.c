@@ -45,66 +45,65 @@ extern struct session *sessionlist;
 #define MAX_SUBNEGO_LENGTH 64
 
 #ifdef TELNET_DEBUG
-static char *will_names[4]={"WILL", "WONT", "DO", "DONT"};
-static char *option_names[]=
-    {
-        "Binary Transmission",
-        "Echo",
-        "Reconnection",
-        "Suppress Go Ahead",
-        "Approx Message Size Negotiation",
-        "Status",
-        "Timing Mark",
-        "Remote Controlled Trans and Echo",
-        "Output Line Width",
-        "Output Page Size",
-        "Output Carriage-Return Disposition",
-        "Output Horizontal Tab Stops",
-        "Output Horizontal Tab Disposition",
-        "Output Formfeed Disposition",
-        "Output Vertical Tabstops",
-        "Output Vertical Tab Disposition",
-        "Output Linefeed Disposition",
-        "Extended ASCII",
-        "Logout",
-        "Byte Macro",
-        "Data Entry Terminal",
-        "SUPDUP",
-        "SUPDUP Output",
-        "Send Location",
-        "Terminal Type",
-        "End of Record",
-        "TACACS User Identification",
-        "Output Marking",
-        "Terminal Location Number",
-        "Telnet 3270 Regime",
-        "X.3 PAD",
-        "Negotiate About Window Size",
-        "Terminal Speed",
-        "Remote Flow Control",
-        "Linemode",
-        "X Display Location",
-        "Environment Option",
-        "Authentication Option",
-        "Encryption Option",
-        "New Environment Option",
-        "TN3270E",
-        "XAUTH",
-        "CHARSET",
-        "Telnet Remote Serial Port (RSP)",
-        "Com Port Control Option",
-        "Telnet Suppress Local Echo",
-        "Telnet Start TLS",
-        "KERMIT",
-        "SEND-URL",
-        "FORWARD_X",
-        "?"/*50*/,"?","?","?","?","?","?","?","?","?",
-        "?"/*60*/,"?","?","?","?","?","?","?","?","?",
-        "?"/*70*/,"?","?","?","?","?","?","?","?","?",
-        "?"/*80*/,"?","?","?","?",
-        "COMPRESS",
-        "COMPRESS2",
-    };
+static char *will_names[4]= {"WILL", "WONT", "DO", "DONT"};
+static char *option_names[]= {
+    "Binary Transmission",
+    "Echo",
+    "Reconnection",
+    "Suppress Go Ahead",
+    "Approx Message Size Negotiation",
+    "Status",
+    "Timing Mark",
+    "Remote Controlled Trans and Echo",
+    "Output Line Width",
+    "Output Page Size",
+    "Output Carriage-Return Disposition",
+    "Output Horizontal Tab Stops",
+    "Output Horizontal Tab Disposition",
+    "Output Formfeed Disposition",
+    "Output Vertical Tabstops",
+    "Output Vertical Tab Disposition",
+    "Output Linefeed Disposition",
+    "Extended ASCII",
+    "Logout",
+    "Byte Macro",
+    "Data Entry Terminal",
+    "SUPDUP",
+    "SUPDUP Output",
+    "Send Location",
+    "Terminal Type",
+    "End of Record",
+    "TACACS User Identification",
+    "Output Marking",
+    "Terminal Location Number",
+    "Telnet 3270 Regime",
+    "X.3 PAD",
+    "Negotiate About Window Size",
+    "Terminal Speed",
+    "Remote Flow Control",
+    "Linemode",
+    "X Display Location",
+    "Environment Option",
+    "Authentication Option",
+    "Encryption Option",
+    "New Environment Option",
+    "TN3270E",
+    "XAUTH",
+    "CHARSET",
+    "Telnet Remote Serial Port (RSP)",
+    "Com Port Control Option",
+    "Telnet Suppress Local Echo",
+    "Telnet Start TLS",
+    "KERMIT",
+    "SEND-URL",
+    "FORWARD_X",
+    "?"/*50*/,"?","?","?","?","?","?","?","?","?",
+    "?"/*60*/,"?","?","?","?","?","?","?","?","?",
+    "?"/*70*/,"?","?","?","?","?","?","?","?","?",
+    "?"/*80*/,"?","?","?","?",
+    "COMPRESS",
+    "COMPRESS2",
+};
 #endif
 
 static void telnet_send_naws(struct session *ses)
@@ -141,8 +140,7 @@ static void telnet_send_ttype(struct session *ses)
 {
     char nego[128],*ttype;
 
-    switch (ses->last_term_type++)
-    {
+    switch (ses->last_term_type++) {
     case 0:
         ttype=TERM;
         break;
@@ -152,16 +150,16 @@ static void telnet_send_ttype(struct session *ses)
     case 2:
         ttype="unknown";
         break;
-    /* contrary to what zMud does, we cannot claim we're "vt100" or "ansi", */
-    /* as we obviously lack an addressable cursor */
+        /* contrary to what zMud does, we cannot claim we're "vt100" or "ansi", */
+        /* as we obviously lack an addressable cursor */
     default:
         ses->last_term_type=0;
     case 3:
         ttype="KBtin-"VERSION;
     }
     write_socket(ses, nego,
-        sprintf(nego, "%c%c%c%c%s%c%c", IAC, SB,
-            TERMINAL_TYPE, IS, ttype, IAC, SE));
+                 sprintf(nego, "%c%c%c%c%s%c%c", IAC, SB,
+                         TERMINAL_TYPE, IS, ttype, IAC, SE));
 #ifdef TELNET_DEBUG
     tintin_printf(ses, "~8~[telnet] sent: IAC SB TERMINAL-TYPE IS \"%s\" IAC SE~-1~", ttype);
 #endif
@@ -172,8 +170,7 @@ void telnet_resize_all(void)
     struct session *sp;
 
     for (sp=sessionlist; sp; sp=sp->next)
-        if (sp->naws)
-        {
+        if (sp->naws) {
             if (sp->issocket)
                 telnet_send_naws(sp);
             else
@@ -194,8 +191,7 @@ int do_telnet_protocol(char *data, int nb, struct session *ses)
 
     if (nb<2)
         return -1;
-    switch (*cp)
-    {
+    switch (*cp) {
     case WILL:
     case WONT:
     case DO:
@@ -207,66 +203,115 @@ int do_telnet_protocol(char *data, int nb, struct session *ses)
         tintin_printf(ses, "~8~[telnet] received: IAC %s <%u> (%s)~-1~",
                       will_names[wt-251], *cp,
                       (*cp<sizeof(option_names)/sizeof(char*))?
-                          option_names[*cp]:"?");
+                      option_names[*cp]:"?");
 #endif
         answer[0]=IAC;
         answer[2]=*cp;
-        switch (*cp)
-        {
+        switch (*cp) {
         case ECHO:
-            switch (wt)
-            {
-            case WILL:  answer[1]=DO;   ses->server_echo=1; break;
-            case DO:    answer[1]=WONT; break;
-            case WONT:  answer[1]=DONT; ses->server_echo=2; break;
-            case DONT:  answer[1]=WONT; break;
+            switch (wt) {
+            case WILL:
+                answer[1]=DO;
+                ses->server_echo=1;
+                break;
+            case DO:
+                answer[1]=WONT;
+                break;
+            case WONT:
+                answer[1]=DONT;
+                ses->server_echo=2;
+                break;
+            case DONT:
+                answer[1]=WONT;
+                break;
             };
             break;
         case TERMINAL_TYPE:
-            switch (wt)
-            {
-            case WILL:  answer[1]=DONT; break;
-            case DO:    answer[1]=WILL; break;
-            case WONT:  answer[1]=DONT; break;
-            case DONT:  answer[1]=WONT; break;
+            switch (wt) {
+            case WILL:
+                answer[1]=DONT;
+                break;
+            case DO:
+                answer[1]=WILL;
+                break;
+            case WONT:
+                answer[1]=DONT;
+                break;
+            case DONT:
+                answer[1]=WONT;
+                break;
             };
             break;
         case NAWS:
-            switch (wt)
-            {
-            case WILL:  answer[1]=DO;   ses->naws=0; break;
-            case DO:    answer[1]=WILL; ses->naws=(LINES>1 && COLS>0); break;
-            case WONT:  answer[1]=DONT; ses->naws=0; break;
-            case DONT:  answer[1]=WONT; ses->naws=0; break;
+            switch (wt) {
+            case WILL:
+                answer[1]=DO;
+                ses->naws=0;
+                break;
+            case DO:
+                answer[1]=WILL;
+                ses->naws=(LINES>1 && COLS>0);
+                break;
+            case WONT:
+                answer[1]=DONT;
+                ses->naws=0;
+                break;
+            case DONT:
+                answer[1]=WONT;
+                ses->naws=0;
+                break;
             };
             break;
         case END_OF_RECORD:
-            switch (wt)
-            {
-            case WILL:  answer[1]=DO;   break;
-            case DO:    answer[1]=WONT; break;
-            case WONT:  answer[1]=DONT; break;
-            case DONT:  answer[1]=WONT; break;
+            switch (wt) {
+            case WILL:
+                answer[1]=DO;
+                break;
+            case DO:
+                answer[1]=WONT;
+                break;
+            case WONT:
+                answer[1]=DONT;
+                break;
+            case DONT:
+                answer[1]=WONT;
+                break;
             };
             break;
 #ifdef HAVE_ZLIB
         case COMPRESS2:
-            switch (wt)
-            {
-            case WILL:  answer[1]=DO;   ses->can_mccp=time(0)-ses->sessionstart<60; break;
-            case DO:    answer[1]=WONT; break;
-            case WONT:  answer[1]=DONT; ses->can_mccp=0; break;
-            case DONT:  answer[1]=WONT; break;
+            switch (wt) {
+            case WILL:
+                answer[1]=DO;
+                ses->can_mccp=time(0)-ses->sessionstart<60;
+                break;
+            case DO:
+                answer[1]=WONT;
+                break;
+            case WONT:
+                answer[1]=DONT;
+                ses->can_mccp=0;
+                break;
+            case DONT:
+                answer[1]=WONT;
+                break;
             };
             break;
 #endif
         default:
-            switch (wt)
-            {
-            case WILL:  answer[1]=DONT; break;
-            case DO:    answer[1]=WONT; break;
-            case WONT:  answer[1]=DONT; break;
-            case DONT:  answer[1]=WONT; break;
+            switch (wt) {
+            case WILL:
+                answer[1]=DONT;
+                break;
+            case DO:
+                answer[1]=WONT;
+                break;
+            case WONT:
+                answer[1]=DONT;
+                break;
+            case DONT:
+                answer[1]=WONT;
+                break;
             };
         }
         write_socket(ses, (char*)answer, 3);
@@ -274,7 +319,7 @@ int do_telnet_protocol(char *data, int nb, struct session *ses)
         tintin_printf(ses, "~8~[telnet] sent: IAC %s <%u> (%s)~-1~",
                       will_names[answer[1]-251], *cp,
                       (*cp<sizeof(option_names)/sizeof(char*))?
-                          option_names[*cp]:"?");
+                      option_names[*cp]:"?");
 #endif
         if (*cp==NAWS)
             telnet_send_naws(ses);
@@ -283,23 +328,20 @@ int do_telnet_protocol(char *data, int nb, struct session *ses)
         np=nego;
 sbloop:
         NEXTCH;
-        while (*cp!=IAC)
-        {
+        while (*cp!=IAC) {
             if (np-nego>MAX_SUBNEGO_LENGTH)
                 goto nego_too_long;
             *np++=*cp;
             NEXTCH;
         }
         NEXTCH;
-        if (*cp==IAC)
-        {
+        if (*cp==IAC) {
             if (np-nego>MAX_SUBNEGO_LENGTH)
                 goto nego_too_long;
             *np++=IAC;
             goto sbloop;
         }
-        if (*cp!=SE)
-        {
+        if (*cp!=SE) {
             if (np-nego>MAX_SUBNEGO_LENGTH)
                 goto nego_too_long;
             *np++=*cp;
@@ -312,12 +354,10 @@ sbloop:
             unsigned int neb=np-nego;
             np=nego;
             b=buf+sprintf(buf, "IAC SB ");
-            switch (*np)
-            {
+            switch (*np) {
             case TERMINAL_TYPE:
                 b+=sprintf(b, "TERMINAL-TYPE ");
-                if (*++np==SEND)
-                {
+                if (*++np==SEND) {
                     b+=sprintf(b, "SEND ");
                     ++np;
                 }
@@ -332,8 +372,7 @@ sbloop:
             tintin_printf(ses, "~8~[telnet] received: %s~-1~", buf);
         }
 #endif
-        switch (*(np=nego))
-        {
+        switch (*(np=nego)) {
         case TERMINAL_TYPE:
             if (*(np+1)==SEND)
                 telnet_send_ttype(ses);
@@ -349,7 +388,7 @@ sbloop:
     case EOR:
 #ifdef TELNET_DEBUG
         tintin_printf(ses, "~8~[telnet] received: IAC %s~-1~",
-            (*cp==GA)?"GA":"EOR");
+                      (*cp==GA)?"GA":"EOR");
 #endif
         ses->gas=1;
         return -2;
@@ -374,8 +413,7 @@ void telnet_write_line(char *line, struct session *ses)
     char outtext[6*BUFFER_SIZE + 2],*out;
 
     out=outtext;
-    while (*line)
-    {
+    while (*line) {
         if ((unsigned char)*line==255)
             *out++=255;
         *out++=*line++;

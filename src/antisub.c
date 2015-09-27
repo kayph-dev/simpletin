@@ -25,14 +25,11 @@ void antisubstitute_command(char *arg, struct session *ses)
     myantisubs = ses->antisubs;
     arg = get_arg_in_braces(arg, left, 1);
 
-    if (!*left)
-    {
+    if (!*left) {
         tintin_puts("#THESE ANTISUBSTITUTES HAS BEEN DEFINED:", ses);
         show_list(myantisubs);
         prompt(ses);
-    }
-    else
-    {
+    } else {
         if ((ln = searchnode_list(myantisubs, left)) != NULL)
             deletenode_list(myantisubs, ln);
         insertnode_list(myantisubs, left, left, 0, ALPHA);
@@ -53,8 +50,7 @@ void unantisubstitute_command(char *arg, struct session *ses)
     myantisubs = ses->antisubs;
     temp = myantisubs;
     arg = get_arg_in_braces(arg, left, 1);
-    while ((ln = search_node_with_wild(temp, left)) != NULL)
-    {
+    while ((ln = search_node_with_wild(temp, left)) != NULL) {
         if (ses->mesvar[2])
             tintin_printf(ses,"#Ok. Lines with {%s} will now be subbed.", ln->left);
         deletenode_list(myantisubs, ln);

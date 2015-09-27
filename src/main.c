@@ -122,10 +122,10 @@ static void sigsegv(void)
     if (ui_own_output)
         user_done();
     fflush(0);
-/*  write(2,"Segmentation fault.\n",20);*/
+    /*  write(2,"Segmentation fault.\n",20);*/
     signal(SIGSEGV, SIG_DFL);
     raise(SIGSEGV);
-/*  exit(SIGSEGV);*/
+    /*  exit(SIGSEGV);*/
 }
 
 static void sigfpe(void)
@@ -133,10 +133,10 @@ static void sigfpe(void)
     if (ui_own_output)
         user_done();
     fflush(0);
-/*  write(2,"Floating point exception.\n",26);*/
+    /*  write(2,"Floating point exception.\n",26);*/
     signal(SIGFPE, SIG_DFL);
     raise(SIGFPE);
-/*  exit(SIGFPE);*/
+    /*  exit(SIGFPE);*/
 }
 
 static void sighup(void)
@@ -192,8 +192,7 @@ static void setup_signals(void)
     if (sigaction(SIGTSTP,&act,0))
         syserr("sigaction SIGTSTP");
 
-    if (ui_own_output && ui_tty)
-    {
+    if (ui_own_output && ui_tty) {
         act.sa_handler=(sighandler_t)sigcont;
         if (sigaction(SIGCONT,&act,0))
             syserr("sigaction SIGCONT");
@@ -202,8 +201,7 @@ static void setup_signals(void)
             syserr("sigaction SIGWINCH");
     }
 
-    if (ui_own_output)
-    {
+    if (ui_own_output) {
         if (signal(SIGSEGV,(sighandler_t)sigsegv) == BADSIG)
             syserr("signal SIGSEGV");
         if (signal(SIGFPE,(sighandler_t)sigfpe) == BADSIG)
@@ -261,7 +259,7 @@ static void init_nullses(void)
     nullsession->loginputsuffix=mystrdup(LOG_INPUT_SUFFIX);
     nullsession->blank = DEFAULT_DISPLAY_BLANK;
     nullsession->echo = ui_sep_input?DEFAULT_ECHO_SEPINPUT
-                                    :DEFAULT_ECHO_NOSEPINPUT;
+                        :DEFAULT_ECHO_NOSEPINPUT;
     nullsession->speedwalk = DEFAULT_SPEEDWALK;
     nullsession->togglesubs = DEFAULT_TOGGLESUBS;
     nullsession->presub = DEFAULT_PRESUB;
@@ -292,14 +290,13 @@ static void init_nullses(void)
     nullsession->sessionstart=nullsession->idle_since=time(0);
     nullsession->debuglogfile=0;
     nullsession->debuglogname=0;
-    for (i=0;i<HISTORY_SIZE;i++)
+    for (i=0; i<HISTORY_SIZE; i++)
         history[i]=0;
-    for (i=0;i<MAX_LOCATIONS;i++)
-    {
+    for (i=0; i<MAX_LOCATIONS; i++) {
         nullsession->routes[i]=0;
         nullsession->locations[i]=0;
     }
-    for (i=0;i<NHOOKS;i++)
+    for (i=0; i<NHOOKS; i++)
         nullsession->hooks[i]=0;
     nullsession->path = init_list();
     nullsession->no_return = 0;
@@ -328,7 +325,7 @@ static void init_nullses(void)
     nullsession->mesvar[13]= DEFAULT_LOG_MESS;
     nullsession->charset=mystrdup(DEFAULT_CHARSET);
     nullsession->logcharset=logcs_is_special(DEFAULT_LOGCHARSET) ?
-                              DEFAULT_LOGCHARSET : mystrdup(DEFAULT_LOGCHARSET);
+                            DEFAULT_LOGCHARSET : mystrdup(DEFAULT_LOGCHARSET);
     nullify_conv(&nullsession->c_io);
     nullify_conv(&nullsession->c_log);
 #ifdef HAVE_GNUTLS
@@ -356,18 +353,14 @@ static void parse_options(int argc, char **argv)
 
     options=init_list();
 
-    for (arg=1;arg<argc;arg++)
-    {
-        if (*argv[arg]=='-' && !noargs)
-        {
+    for (arg=1; arg<argc; arg++) {
+        if (*argv[arg]=='-' && !noargs) {
             if (!strcmp(argv[arg],"--"))
                 noargs=1;
-            else if (!strcmp(argv[arg],"--version")) /* make autotest happy */
-            {
+            else if (!strcmp(argv[arg],"--version")) { /* make autotest happy */
                 printf("KBtin version "VERSION"\n");
                 exit(0);
-            }
-            else if (!strcmp(argv[arg],"-v"))
+            } else if (!strcmp(argv[arg],"-v"))
                 addnode_list(options, "#verbose 1", 0, 0);
             else if (!strcmp(argv[arg],"-q"))
                 addnode_list(options, "#verbose 0", 0, 0);
@@ -375,33 +368,26 @@ static void parse_options(int argc, char **argv)
                 user_setdriver(0);
             else if (!strcmp(argv[arg],"-i"))
                 user_setdriver(1);
-            else if (!strcmp(argv[arg],"-c"))
-            {
+            else if (!strcmp(argv[arg],"-c")) {
                 if (++arg==argc)
                     opterror("Invalid option: bare -c");
                 else
                     addnode_list(options, "c", argv[arg], 0);
-            }
-            else if (!strcmp(argv[arg],"-r"))
-            {
+            } else if (!strcmp(argv[arg],"-r")) {
                 if (++arg==argc)
                     opterror("Invalid option: bare -r");
                 else
                     addnode_list(options, "r", argv[arg], 0);
-            }
-            else if (!strcasecmp(argv[arg],"-s"))
-            {
+            } else if (!strcasecmp(argv[arg],"-s")) {
                 if (++arg==argc)
                     opterror("Invalid option: bare %s", argv[arg]);
                 else if (++arg==argc)
                     opterror("Bad option: -s needs both an address and a port number!");
                 else
                     addnode_list(options, argv[arg-2]+1, argv[arg-1], argv[arg]);
-            }
-            else
+            } else
                 opterror("Invalid option: {%s}",argv[arg]);
-        }
-        else
+        } else
             addnode_list(options, " ", argv[arg], 0);
     }
     if (argc<=1)
@@ -417,10 +403,8 @@ static void apply_options()
 # define DO_INPUT(str,iv) local_to_utf8(ustr,str,BUFFER_SIZE,0);\
                           activesession=parse_input(str,iv,activesession);
 
-    for (opt=options->next; opt; opt=opt->next)
-    {
-        switch (*opt->left)
-        {
+    for (opt=options->next; opt; opt=opt->next) {
+        switch (*opt->left) {
         case '#':
             *opt->left=tintin_char;
             activesession=parse_input(opt->left,1,activesession);
@@ -432,32 +416,30 @@ static void apply_options()
             set_magic_hook(activesession);
             make_name(sname, opt->right, 1);
             snprintf(temp, BUFFER_SIZE,
-                "%crun %s {%s}", tintin_char, sname, opt->right);
+                     "%crun %s {%s}", tintin_char, sname, opt->right);
             DO_INPUT(temp, 1);
             break;
         case 's':
             set_magic_hook(activesession);
             make_name(sname, opt->right, 1);
             snprintf(temp, BUFFER_SIZE,
-                "%cses %s {%s %s}", tintin_char, sname, opt->right, opt->pr);
+                     "%cses %s {%s %s}", tintin_char, sname, opt->right, opt->pr);
             DO_INPUT(temp, 1);
             break;
         case 'S':
             set_magic_hook(activesession);
             make_name(sname, opt->right, 1);
             snprintf(temp, BUFFER_SIZE,
-                "%csslses %s {%s %s}", tintin_char, sname, opt->right, opt->pr);
+                     "%csslses %s {%s %s}", tintin_char, sname, opt->right, opt->pr);
             DO_INPUT(temp, 1);
             break;
         case ' ':
             local_to_utf8(ustr, opt->right, BUFFER_SIZE, 0);
-            if ((f=fopen(opt->right,"r")))
-            {
+            if ((f=fopen(opt->right,"r"))) {
                 if (activesession->verbose || !real_quiet)
                     tintin_printf(0, "#READING {%s}", ustr);
                 activesession = do_read(f, ustr, activesession);
-            }
-            else
+            } else
                 tintin_eprintf(0, "#FILE NOT FOUND: {%s}", ustr);
             break;
         case '-':
@@ -475,10 +457,8 @@ static void apply_options()
             local_to_utf8(ustr, temp, BUFFER_SIZE, 0);
             if ((f=fopen(temp,"r")))
                 activesession = do_read(f, ustr, activesession);
-            else
-            {
-                if ((strptr = (char *)getenv("HOME")))
-                {
+            else {
+                if ((strptr = (char *)getenv("HOME"))) {
                     strcpy(homepath, strptr);
                     strcpy(temp, homepath);
                     strcat(temp, "/.tintinrc");
@@ -514,15 +494,14 @@ int main(int argc, char **argv)
     srand((getpid()*0x10001)^time0);
     lastdraft=0;
 
-    if (ui_own_output || tty)
-    {
-/*
-    Legal crap does _not_ belong here.  Anyone interested in the license
-can check the files accompanying KBtin, without any need of being spammed
-every time.  It is not GNU bc or something similar, we don't want half
-a screenful of all-uppercase (cAPS kEY IS STUCK AGAIN?) text that no one
-ever wants to read -- that is what docs are for.
-*/
+    if (ui_own_output || tty) {
+        /*
+            Legal crap does _not_ belong here.  Anyone interested in the license
+        can check the files accompanying KBtin, without any need of being spammed
+        every time.  It is not GNU bc or something similar, we don't want half
+        a screenful of all-uppercase (cAPS kEY IS STUCK AGAIN?) text that no one
+        ever wants to read -- that is what docs are for.
+        */
         tintin_printf(0,"~2~##########################################################");
         tintin_printf(0, "#~7~                ~12~K B ~3~t i n~7~     v %-23s ~2~#", VERSION);
         tintin_printf(0,"#                                                        #");
@@ -568,8 +547,7 @@ static int check_events(void)
     curr_time = time(NULL);
 restart:
     any_closed=0;
-    for (sp = sessionlist; sp; sp = sp->next)
-    {
+    for (sp = sessionlist; sp; sp = sp->next) {
         tt = check_event(curr_time, sp);
         if (any_closed)
             goto restart;
@@ -602,11 +580,9 @@ static void tintin(void)
 
     memset(&instate, 0, sizeof(instate));
 
-    while (TRUE)
-    {
+    while (TRUE) {
 #ifdef XTERM_TITLE
-        if (ui_own_output && activesession!=lastsession)
-        {
+        if (ui_own_output && activesession!=lastsession) {
             lastsession=activesession;
             if (activesession==nullsession)
                 user_title(XTERM_TITLE, "(no session)");
@@ -622,11 +598,9 @@ static void tintin(void)
         FD_ZERO(&readfdmask);
         if (!eofinput)
             FD_SET(0, &readfdmask);
-        else
-            if (activesession==nullsession)
-                end_command(0, activesession);
-        for (sesptr = sessionlist; sesptr; sesptr = sesptr->next)
-        {
+        else if (activesession==nullsession)
+            end_command(0, activesession);
+        for (sesptr = sessionlist; sesptr; sesptr = sesptr->next) {
             if (sesptr==nullsession)
                 continue;
             if (sesptr->nagle)
@@ -638,13 +612,7 @@ static void tintin(void)
         result = select(maxfd+1, &readfdmask, 0, 0, &tv);
 
         if (need_resize)
-        {
-            char buf[BUFFER_SIZE];
-
             user_resize();
-            sprintf(buf, "#NEW SCREEN SIZE: %dx%d.", COLS, LINES);
-            tintin_puts1(buf, activesession);
-        }
 
         if (result == 0)
             continue;
@@ -653,8 +621,7 @@ static void tintin(void)
         else if (result < 0)
             syserr("select");
 
-        if (FD_ISSET(0, &readfdmask))
-        {
+        if (FD_ISSET(0, &readfdmask)) {
             PROFSTART;
             PROFPUSH("user interface");
             result=read(0, kbdbuf+inbuf, BUFFER_SIZE-inbuf);
@@ -665,30 +632,24 @@ static void tintin(void)
             inbuf+=result;
 
             i=0;
-            while (i<inbuf)
-            {
+            while (i<inbuf) {
                 result=mbrtowc(&ch, kbdbuf+i, inbuf-i, &instate);
-                if (result==-2)         /* incomplete but valid sequence */
-                {
+                if (result==-2) {       /* incomplete but valid sequence */
                     memmove(kbdbuf, kbdbuf+i, inbuf-i);
                     inbuf-=i;
                     goto partial;
-                }
-                else if (result==-1)    /* invalid sequence */
-                {
+                } else if (result==-1) { /* invalid sequence */
                     ch=0xFFFD;
                     i++;
                     errno=0;
                     /* Shift by 1 byte.  We can use a more intelligent shift,
                      * but staying charset-agnostic makes the code simpler.
                      */
-                }
-                else if (result==0)     /* literal 0 */
+                } else if (result==0)   /* literal 0 */
                     i++; /* oops... bad ISO/ANSI, bad */
                 else
                     i+=result;
-                if (user_process_kbd(activesession, ch))
-                {
+                if (user_process_kbd(activesession, ch)) {
                     hist_num=-1;
 
                     if (term_echoing || (got_more_kludge && done_input[0]))
@@ -701,7 +662,7 @@ static void tintin(void)
                             echo_input(done_input);
                         if (activesession->logfile)
                             write_logf(activesession, done_input,
-                                activesession->loginputprefix, activesession->loginputsuffix);
+                                       activesession->loginputprefix, activesession->loginputsuffix);
                     }
                     if (*done_input)
                         strcpy(prev_command, done_input);
@@ -711,21 +672,17 @@ static void tintin(void)
                 }
             }
             inbuf=0;
-        partial:
+partial:
             PROFEND(kbd_lag,kbd_cnt);
             PROFPOP;
         }
-        for (sesptr = sessionlist; sesptr; sesptr = sesptr->next)
-        {
-            if (sesptr->socket && FD_ISSET(sesptr->socket,&readfdmask))
-            {
+        for (sesptr = sessionlist; sesptr; sesptr = sesptr->next) {
+            if (sesptr->socket && FD_ISSET(sesptr->socket,&readfdmask)) {
                 aborting=0;
                 any_closed=0;
-                do
-                {
+                do {
                     read_mud(sesptr);
-                    if (any_closed)
-                    {
+                    if (any_closed) {
                         any_closed=0;
                         goto after_read;
                         /* The remaining sessions will be done after select() */
@@ -733,14 +690,14 @@ static void tintin(void)
 #ifdef HAVE_ZLIB
                 } while (sesptr->mccp_more);
 #else
-                } while (0);
+                }
+                while (0);
 #endif
             }
         }
-    after_read:
+after_read:
         if (activesession->server_echo
-            && (2-activesession->server_echo != gotpassword))
-        {
+                && (2-activesession->server_echo != gotpassword)) {
             gotpassword= 2-activesession->server_echo;
             if (!gotpassword)
                 got_more_kludge=0;
@@ -761,26 +718,20 @@ static void read_mud(struct session *ses)
     int didget, n, count;
 
     PROFSTART;
-    if ((didget = read_buffer_mud(buffer, ses))==-1)
-    {
+    if ((didget = read_buffer_mud(buffer, ses))==-1) {
         cleanup_session(ses);
         if (ses == activesession)
             activesession = newactive_session();
         return;
-    }
-    else
-    {
+    } else {
         if (!didget)
             return; /* possible if only telnet protocol data was received */
     }
-    if (ses->logfile)
-    {
-        if (ses->logtype)
-        {
+    if (ses->logfile) {
+        if (ses->logtype) {
             count=0;
 
-            if (ses->halfcr_log)
-            {
+            if (ses->halfcr_log) {
                 ses->halfcr_log=0;
                 if (buffer[0]!='\n')
                     temp[count++]='\r';
@@ -789,8 +740,7 @@ static void read_mud(struct session *ses)
             for (n = 0; n < didget; n++)
                 if (buffer[n] != '\r')
                     temp[count++] = buffer[n];
-                else
-                {
+                else {
                     if (n+1==didget)
                         ses->halfcr_log=1;
                     else if (buffer[n+1]!='\n')
@@ -798,9 +748,7 @@ static void read_mud(struct session *ses)
                 }
             temp[count]=0;      /* didget<BUFFER_SIZE, so no overflow */
             write_log(ses, temp, count);
-        }
-        else
-        {
+        } else {
             buffer[didget]=0;
             write_log(ses, buffer, didget);
         }
@@ -810,29 +758,24 @@ static void read_mud(struct session *ses)
     strcpy(linebuffer, ses->last_line);
     cpdest = strchr(linebuffer,'\0');
 
-    if (ses->halfcr_in)
-    {
+    if (ses->halfcr_in) {
         ses->halfcr_in=0;
         goto halfcr;
     }
-    while (*cpsource)
-    {       /*cut out each of the lines and process */
-        if (*cpsource == '\n')
-        {
+    while (*cpsource) {
+        /*cut out each of the lines and process */
+        if (*cpsource == '\n') {
             *cpdest = '\0';
             do_one_line(linebuffer,1,ses);
 
             cpsource++;
             cpdest=linebuffer;
-        }
-        else if (*cpsource=='\r')
-        {
+        } else if (*cpsource=='\r') {
             cpsource++;
-        halfcr:
+halfcr:
             if (*cpsource=='\n')
                 continue;
-            if (!*cpsource)
-            {
+            if (!*cpsource) {
                 ses->halfcr_in=1;
                 break;
             }
@@ -840,12 +783,10 @@ static void read_mud(struct session *ses)
             if (cpdest!=linebuffer)
                 do_one_line(linebuffer,0,ses);
             cpdest=linebuffer;
-        }
-        else
+        } else
             *cpdest++ = *cpsource++;
     }
-    if (cpdest-linebuffer>INPUT_CHUNK) /* let's split too long lines */
-    {
+    if (cpdest-linebuffer>INPUT_CHUNK) { /* let's split too long lines */
         *cpdest=0;
         do_one_line(linebuffer,1,ses);
         cpdest=linebuffer;
@@ -870,21 +811,18 @@ static void do_one_line(char *line,int nl,struct session *ses)
     convert(&ses->c_io, ubuf, line, -1);
 # define line ubuf
     PROF("looking for passwords");
-    switch (ses->server_echo)
-    {
+    switch (ses->server_echo) {
     case 0:
         if ((match(PROMPT_FOR_PW_TEXT,line)
-            || match(PROMPT_FOR_PW_TEXT2,line))
-           && !gotpassword)
-        {
+                || match(PROMPT_FOR_PW_TEXT2,line))
+                && !gotpassword) {
             gotpassword=1;
             user_passwd(1);
             term_echoing=FALSE;
         };
         break;
     case 1:
-        if (match(PROMPT_FOR_MORE_TEXT,line))
-        {
+        if (match(PROMPT_FOR_MORE_TEXT,line)) {
             user_passwd(0);
             got_more_kludge=1;
         };
@@ -909,23 +847,17 @@ static void do_one_line(char *line,int nl,struct session *ses)
     if (isnb&&!ses->togglesubs)
         do_all_high(line, ses);
     PROF("display");
-    if (isnotblank(line,ses->blank))
-    {
-        if (ses==activesession)
-        {
-            if (nl)
-            {
+    if (isnotblank(line,ses->blank)) {
+        if (ses==activesession) {
+            if (nl) {
                 if (!activesession->server_echo)
                     gotpassword=0;
                 sprintf(strchr(line,0),"\n");
                 user_textout_draft(0, 0);
                 user_textout(line);
                 lastdraft=0;
-            }
-            else
-            {
-                if (ui_drafts)
-                {
+            } else {
+                if (ui_drafts) {
                     isnb = ses->gas ? ses->ga : iscompleteprompt(line);
                     if (ses->partial_line_marker)
                         sprintf(strchr(line,0), "%s", ses->partial_line_marker);
@@ -933,10 +865,8 @@ static void do_one_line(char *line,int nl,struct session *ses)
                 }
                 lastdraft=ses;
             }
-        }
-        else
-            if (ses->snoopstatus)
-                snoop(line,ses);
+        } else if (ses->snoopstatus)
+            snoop(line,ses);
     }
     PROFPOP;
     _=0;
@@ -956,8 +886,7 @@ static void echo_input(char *txt)
     char out[BUFFER_SIZE],*cptr,*optr;
     static int c=7;
 
-    if (ui_own_output)
-    {
+    if (ui_own_output) {
         user_textout("");
         c=lastcolor;
     }
@@ -966,8 +895,7 @@ static void echo_input(char *txt)
     if (ui_own_output)
         optr+=sprintf(optr, ECHO_COLOR);
     cptr=txt;
-    while (*cptr)
-    {
+    while (*cptr) {
         if ((*optr++=*cptr++)=='~')
             optr+=sprintf(optr, "~:~");
         if (optr-out > BUFFER_SIZE-10)
@@ -975,8 +903,7 @@ static void echo_input(char *txt)
     }
     if (ui_own_output)
         optr+=sprintf(optr, "~%d~\n", c);
-    else
-    {
+    else {
         *optr++='\n';
         *optr=0;
     }
@@ -991,11 +918,9 @@ static void myquitsig(int sig)
     struct session *sesptr, *t;
     int err=errno;
 
-    for (sesptr = sessionlist; sesptr; sesptr = t)
-    {
+    for (sesptr = sessionlist; sesptr; sesptr = t) {
         t = sesptr->next;
-        if (sesptr!=nullsession && !sesptr->closing)
-        {
+        if (sesptr!=nullsession && !sesptr->closing) {
             sesptr->closing=1;
             do_hook(sesptr, HOOK_ZAP, 0, 1);
             sesptr->closing=0;
@@ -1006,11 +931,9 @@ static void myquitsig(int sig)
     do_hook(nullsession, HOOK_END, 0, 1);
     activesession = NULL;
 
-    if (ui_own_output)
-    {
+    if (ui_own_output) {
         user_textout("~7~\n");
-        switch (sig)
-        {
+        switch (sig) {
         case SIGTERM:
             user_textout("Terminated\n");
             break;
@@ -1024,9 +947,7 @@ static void myquitsig(int sig)
             user_textout(strerror(err));
         }
         user_done();
-    }
-    else
-        if (tty)
-            user_textout("~7~\n");
+    } else if (tty)
+        user_textout("~7~\n");
     exit(0);
 }

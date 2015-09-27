@@ -6,9 +6,9 @@
 
 extern struct session *nullsession;
 
-const int colors[8]={0,4,2,6,1,5,3,7};
+const int colors[8]= {0,4,2,6,1,5,3,7};
 static int mudcolors=3;    /* 0=disabled, 1=on, 2=null, 3=null+warning */
-static char *MUDcolors[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static char *MUDcolors[16]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int getcolor(char **ptr,int *color,const int flag)
 {
@@ -17,54 +17,44 @@ int getcolor(char **ptr,int *color,const int flag)
 
     if (*(txt++)!='~')
         return 0;
-    if (flag&&(*txt=='-')&&(*(txt+1)=='1')&&(*(txt+2)=='~'))
-    {
+    if (flag&&(*txt=='-')&&(*(txt+1)=='1')&&(*(txt+2)=='~')) {
         *color=-1;
         *ptr+=3;
         return 1;
     };
-    if (isdigit(*txt))
-    {
+    if (isdigit(*txt)) {
         fg=strtol(txt,&txt,10);
         if (fg>1023)
             return 0;
-    }
-    else
-    if (*txt==':')
+    } else if (*txt==':')
         fg=(*color==-1)? 7 : ((*color)&15);
     else
         return 0;
-    if (*txt=='~')
-    {
+    if (*txt=='~') {
         *color=fg;
         *ptr=txt;
         return 1;
     };
     if (*txt!=':')
         return 0;
-    if (isdigit(*++txt))
-    {
+    if (isdigit(*++txt)) {
         bg=strtol(txt,&txt,10);
         if (bg>7)
             return 0;
-    }
-    else
+    } else
         bg=(*color==-1)? 0 : ((*color&0x70)>>4);
-    if (*txt=='~')
-    {
+    if (*txt=='~') {
         *color=bg<<4|fg;
         *ptr=txt;
         return 1;
     };
     if (*txt!=':')
         return 0;
-    if (isdigit(*++txt))
-    {
+    if (isdigit(*++txt)) {
         blink=strtol(txt,&txt,10);
         if (blink>7)
             return 0;
-    }
-    else
+    } else
         blink=(*color==-1)? 0 : (*color>>7);
     if (*txt!='~')
         return 0;
@@ -94,17 +84,14 @@ void do_in_MUD_colors(char *txt,int quotetype)
     char OUT[BUFFER_SIZE*20],*out,*back,*TXT=txt;
     int tok[MAXTOK],nt,i;
 
-    for (out=OUT;*txt;txt++)
-        switch (*txt)
-        {
+    for (out=OUT; *txt; txt++)
+        switch (*txt) {
         case 27:
-            if (*(txt+1)=='[')
-            {
+            if (*(txt+1)=='[') {
                 back=txt++;
                 tok[0]=nt=0;
 again:
-                switch (*++txt)
-                {
+                switch (*++txt) {
                 case 0:
                     goto error;
                 case ';':
@@ -112,8 +99,16 @@ again:
                         goto error;
                     tok[nt]=0;
                     goto again;
-                case '0': case '1': case '2': case '3': case '4':
-                case '5': case '6': case '7': case '8': case '9':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
                     tok[nt]=tok[nt]*10+*txt-'0';
                     goto again;
                 case 'm':
@@ -121,9 +116,8 @@ again:
                         nt++;
                     else
                         ccolor=7;
-                    for (i=0;i<nt;i++)
-                        switch (tok[i])
-                        {
+                    for (i=0; i<nt; i++)
+                        switch (tok[i]) {
                         case 0:
                             ccolor=7;
                             break;
@@ -177,14 +171,14 @@ again:
                                 ccolor=(ccolor&0x38f)|(colors[tok[i]-40]<<4);
                             /* ignore unknown attributes */
                         }
-                        out+=setcolor(out,ccolor);
+                    out+=setcolor(out,ccolor);
                     break;
                 case 'C':
                     if (tok[0]<0)     /* sanity check */
                         break;
                     if (out-OUT+tok[0]>INPUT_CHUNK*2)
                         break;       /* something fishy is going on */
-                    for (i=0;i<tok[0];i++)
+                    for (i=0; i<tok[0]; i++)
                         *out++=' ';
                     break;
                 case 'D': /* this interpretation is badly invalid... */
@@ -200,22 +194,18 @@ again:
 error:
                     txt=back;
                 }
-            }
-            else if (*(txt+1)=='%' && *(txt+2)=='G')
+            } else if (*(txt+1)=='%' && *(txt+2)=='G')
                 txt+=2;
             break;
         case '~':
             back=txt;
-            if (getcolor(&txt,&i,1))
-            {
-                if (quotetype)
-                {
+            if (getcolor(&txt,&i,1)) {
+                if (quotetype) {
                     *out++='~';
                     *out++='~';
                     *out++=':';
                     *out++='~';
-                }
-                else
+                } else
                     *out++='`';
                 back++;
                 while (back<txt)
@@ -240,16 +230,14 @@ void do_out_MUD_colors(char *line)
 
     if (!mudcolors)
         return;
-    for (;*pos;pos++)
-    {
+    for (; *pos; pos++) {
         if (*pos=='~')
             if (getcolor(&pos,&c,0))
                 goto color;
         *txt++=*pos;
         continue;
 color:
-        switch (mudcolors)
-        {
+        switch (mudcolors) {
         case 3:
             tintin_printf(0,"#Warning: no color codes set, use #mudcolors");
             mudcolors=2;
@@ -272,37 +260,30 @@ void mudcolors_command(char *arg,struct session *ses)
     char cc[BUFFER_SIZE][16],buf[BUFFER_SIZE];
     int nc;
 
-    if (!*arg)
-    {
+    if (!*arg) {
 error_msg:
         tintin_eprintf(ses,"#ERROR: valid syntax is: #mudcolors OFF, #mudcolors {} or #mudcolors {c0} {c1} ... {c15}");
         return;
     }
-    if (!yes_no(arg))
-    {
+    if (!yes_no(arg)) {
         mudcolors=0;
         tintin_printf(ses,"#outgoing color codes (~n~) are now sent verbatim.");
         return;
     }
-    if (!*get_arg_in_braces(arg,buf,0))
-    {
+    if (!*get_arg_in_braces(arg,buf,0)) {
         arg=buf;
         if (!*arg)
             goto null_codes;
     }
     /* we allow BOTH {a} {b} {c} _and_ {{a} {b} {c}} - inconstency, but it's ok */
-    for (nc=0;nc<16;nc++)
-    {
-        if (!*arg)
-        {
-            if ((nc==1)&&!*cc[0])
-            {
+    for (nc=0; nc<16; nc++) {
+        if (!*arg) {
+            if ((nc==1)&&!*cc[0]) {
 null_codes:
                 mudcolors=2;
                 tintin_printf(ses,"#outgoing color codes are now ignored.");
                 return;
-            }
-            else
+            } else
                 goto error_msg;
         }
         arg=get_arg_in_braces(arg,cc[nc],0);
@@ -310,8 +291,7 @@ null_codes:
     if (*arg)
         goto error_msg;
     mudcolors=1;
-    for (nc=0;nc<16;nc++)
-    {
+    for (nc=0; nc<16; nc++) {
         SFREE(MUDcolors[nc]);
         MUDcolors[nc]=mystrdup(cc[nc]);
     };

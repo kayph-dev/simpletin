@@ -61,10 +61,10 @@ void profile_command(struct session *ses, char *arg)
     zap_list(hl);
     if (kbd_cnt)
         tintin_printf(0, "Avg. response time for kbd input: %d.%06d",
-            (kbd_lag/kbd_cnt)/1000000, (kbd_lag/kbd_cnt)%1000000);
+                      (kbd_lag/kbd_cnt)/1000000, (kbd_lag/kbd_cnt)%1000000);
     if (mud_cnt)
         tintin_printf(0, "Avg. response time for mud input: %d.%06d",
-            (mud_lag/mud_cnt)/1000000, (mud_lag/mud_cnt)%1000000);
+                      (mud_lag/mud_cnt)/1000000, (mud_lag/mud_cnt)%1000000);
 }
 
 #endif

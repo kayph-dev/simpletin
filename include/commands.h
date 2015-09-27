@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_COMMANDS_H__
+#define __SIMPLETIN_COMMANDS_H__
+
 extern struct session *all_command(char *arg, struct session *ses);
 extern struct session *session_command(char *arg, struct session *ses);
 extern struct session *sslsession_command(char *arg, struct session *ses);
@@ -148,3 +151,5 @@ extern void            gmtime_command(char *arg, struct session *ses);
 extern void            ctoi_command(char *arg, struct session *ses);
 extern void            loginputformat_command(char *arg, struct session *ses);
 extern void            initvariable_command(char *arg, struct session *ses);
+
+#endif /* end of include guard: __SIMPLETIN_COMMANDS_H__ */

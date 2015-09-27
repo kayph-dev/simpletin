@@ -87,8 +87,7 @@ size_t strlcpy(char *dst, const char *src, size_t n)
         if (!(*dst++ = *s++))
             break;
 
-    if (!n)
-    {
+    if (!n) {
         *dst++ = 0;
         while (*s++)
             ;

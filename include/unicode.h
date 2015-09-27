@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_UNICODE_H__
+#define __SIMPLETIN_UNICODE_H__
+
 #define WC wchar_t
 #define WCL sizeof(WC)
 #define WCI wint_t
@@ -42,3 +45,5 @@ void utf8_to_mb(char **d, char *s, mbstate_t *cs);
 #define towupper(x) toupper(x)
 #define towlower(x) tolower(x)
 #endif
+
+#endif /* end of include guard: __SIMPLETIN_UNICODE_H__ */

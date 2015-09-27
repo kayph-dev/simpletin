@@ -11,18 +11,15 @@ int match(char *regex, char *string)
 {
     char *rp = regex, *sp = string, ch, *save;
 
-    while (*rp != '\0')
-    {
-        switch (ch = *rp++)
-        {
+    while (*rp != '\0') {
+        switch (ch = *rp++) {
         case '*':
             if ('\0' == *sp)           /* match empty string at end of `string' */
                 return '\0' == *rp;    /* but only if we're done with the pattern */
             /* greedy algorithm: save starting location, then find end of string */
             save = sp;
             sp += strlen(sp);
-            do
-            {
+            do {
                 if (match(rp, sp))     /* return success if we can match here */
                     return 1;
             } while (--sp >= save);    /* otherwise back up and try again */
@@ -33,8 +30,7 @@ int match(char *regex, char *string)
             return 0;
             /* break; not reached */
         case '\\':
-            if ((ch = *rp++) != '\0')
-            {
+            if ((ch = *rp++) != '\0') {
                 /* if not end of pattern, match next char explicitly */
                 if (ch != *sp++)
                     return 0;
@@ -66,8 +62,7 @@ int find(char *text,char *pat,int *from,int *to,char *fastener)
     char *a,*b,*txt,m1[BUFFER_SIZE],m2[BUFFER_SIZE];
     int i;
 
-    if (fastener)
-    {
+    if (fastener) {
         txt=strstr(text,fastener);
         if (!txt)
             return 0;
@@ -80,13 +75,11 @@ int find(char *text,char *pat,int *from,int *to,char *fastener)
     }
 
     txt=text;
-    if (*pat=='^')
-    {
-        for (pat++;(*pat)&&(*pat!='*');)
+    if (*pat=='^') {
+        for (pat++; (*pat)&&(*pat!='*');)
             if (*(pat++)!=*(txt++))
                 return 0;
-        if (!*pat)
-        {
+        if (!*pat) {
             *from=0;
             *to=txt-text-1;
             return 1;
@@ -95,16 +88,13 @@ int find(char *text,char *pat,int *from,int *to,char *fastener)
         pat=m1;
         goto start;
     };
-    if (!(b=strchr(pat,'*')))
-    {
+    if (!(b=strchr(pat,'*'))) {
         a=strstr(txt,pat);
-        if (a)
-        {
+        if (a) {
             *from=a-text;
             *to=*from+strlen(pat)-1;
             return 1;
-        }
-        else
+        } else
             return 0;
     };
     i=b-pat;
@@ -112,8 +102,7 @@ int find(char *text,char *pat,int *from,int *to,char *fastener)
     pat=m1;
     pat[i]=0;
     txt=strstr(txt,pat);
-    if (!txt)
-    {
+    if (!txt) {
         return 0;
     };
     *from=txt-text;
@@ -123,27 +112,24 @@ int find(char *text,char *pat,int *from,int *to,char *fastener)
         pat++;
 start:
     i=strlen(pat);
-    if (!*pat)
-    {
+    if (!*pat) {
         *to=strlen(text)-1;
         return 1;
     };
     a=pat;
     b=pat+i-1;
-    while (a<b)
-    {
+    while (a<b) {
         char c=*a;
         *a++=*b;
         *b--=c;
     };
     i=strlen(txt);
-    for (a=m2+i-1;*txt;)
+    for (a=m2+i-1; *txt;)
         *a--=*txt++;
     m2[i]=0;
     txt=m2;
     *to=-1;
-    do
-    {
+    do {
         b=strchr(pat,'*');
         if (b)
             *b=0;
@@ -173,13 +159,10 @@ char* get_fastener(char *txt, char *mbl)
     m=txt;
     while (*m && *m!='*')
         m++;
-    if (*m=='*')
-    {
+    if (*m=='*') {
         if (*(m+1))
             return 0;
-    }
-    else
-    {
+    } else {
         if (*m)
             return 0;
     }

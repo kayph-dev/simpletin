@@ -13,11 +13,9 @@ void ctoi(char* input)
     char* tmp;
     j = 0;
     tmp = input;
-    while (*tmp&&*(tmp+1))
-    {
-        for (i=0;i<nod;i++)
-            if (!strncmp(tmp, cdigit[i], 3))
-            {
+    while (*tmp&&*(tmp+1)) {
+        for (i=0; i<nod; i++)
+            if (!strncmp(tmp, cdigit[i], 3)) {
                 if (i==14)      /* synonyms */
                     i=2;
                 else if (i==15)
@@ -26,59 +24,45 @@ void ctoi(char* input)
                 goto ok;
             }
         break;
-    ok:
+ok:
         j++;
         tmp+=3;
     }
     result[j]=0; /*just sth != 10, chitchat*/
     num = j;
     lastunit = 0;
-    for (i=0, j=0;i<num;i++)
-    {
-        if (result[i]==0)
-        {
+    for (i=0, j=0; i<num; i++) {
+        if (result[i]==0) {
             if (result[i+1]!=10) continue;
             else result[i]=1; /*for 一千零十, change to 一千一十, chitchat*/
         }
-        if (i==0&&result[0]==10)
-        {
+        if (i==0&&result[0]==10) {
             lastunit = 10;
             input[j] = '1';
             j++;
             lastdigit = 0;
-        }
-        else if (result[i]<10)
-        {
-            if (lastunit<=10)
-            {
+        } else if (result[i]<10) {
+            if (lastunit<=10) {
                 input[j] = '0' + result[i];
                 j++;
                 lastunit = 0;
-            }
-            else
+            } else
                 lastdigit = result[i];
-        }
-        else if (result[i]<13)
-        {
+        } else if (result[i]<13) {
             if (lastunit>result[i]+1)
-                for (k=0;k<lastunit-result[i]-1;k++)
-                {
+                for (k=0; k<lastunit-result[i]-1; k++) {
                     input[j] = '0';
                     j++;
                 }
-            if (lastunit)
-            {
+            if (lastunit) {
                 input[j] = '0' + lastdigit;
                 j++;
             }
             lastunit = result[i];
             lastdigit = 0;
-        }
-        else if (result[i]==13)
-        {
+        } else if (result[i]==13) {
             if (lastunit>=10)
-                for (k=0;k<lastunit-9;k++)
-                {
+                for (k=0; k<lastunit-9; k++) {
                     input[j] = '0';
                     j++;
                 }
@@ -86,10 +70,8 @@ void ctoi(char* input)
             lastdigit = 0;
         }
     }
-    if (lastunit>=10)
-    {
-        for (k=0;k<lastunit-9;k++)
-        {
+    if (lastunit>=10) {
+        for (k=0; k<lastunit-9; k++) {
             input[j] = '0';
             j++;
         }
