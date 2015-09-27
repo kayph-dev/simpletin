@@ -101,6 +101,12 @@ find_package(Resolve)
 find_package(Socket)
 find_package(GnuTLS)
 find_package(ZLIB)
+find_package(PCRE REQUIRED)
+
+target_link_libraries(${PROJECT_NAME}
+    ${PCRE_LIBRARIES})
+
+include_directories(${PCRE_INCLUDE_DIRS})
 
 if (UTIL_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Util_LIBRARY})
@@ -111,7 +117,7 @@ if (NSL_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Nsl_LIBRARY})
     set(HAVE_NSL 1)
 endif (NSL_FOUND)
-    
+
 if (RESOLVE_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Resolve_LIBRARY})
     set(HAVE_RESOLVE 1)
@@ -141,4 +147,3 @@ if (ZLIB_FOUND)
 endif (ZLIB_FOUND)
 
 configure_file(${PROJECT_SOURCE_DIR}/include/kbtin_config.h.in ${PROJECT_BINARY_DIR}/kbtin_config.h)
-
