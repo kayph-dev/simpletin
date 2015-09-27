@@ -343,10 +343,7 @@ int read_buffer_mud(char *buffer, struct session *ses)
     {
         didget = read_socket(ses, tmpbuf+len, INPUT_CHUNK-len);
 
-        if (didget < 0)
-            return -1;
-
-        else if (didget == 0)
+        if (didget <= 0)
             return -1;
     }
 
