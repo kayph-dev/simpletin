@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_TINTIN_H__
+#define __SIMPLETIN_TINTIN_H__
+
 /******************************************************************/
 /* file: tintin.h - the include file for KBtin                    */
 /******************************************************************/
@@ -403,3 +406,5 @@ struct ttyrec_header {
 
 #define write_stdout(x, len) do if (write(1, (x), (len))!=(len)) \
                                   syserr("write to stdout failed"); while (0)
+
+#endif /* end of include guard: __SIMPLETIN_TINTIN_H__ */

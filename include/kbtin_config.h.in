@@ -1,5 +1,5 @@
-#ifndef __KBTIN_KBTINCONFIG_H__
-#define __KBTIN_KBITCONFIG_H__
+#ifndef __SIMPLETIN_KBTINCONFIG_H__
+#define __SIMPLETIN_KBITCONFIG_H__
 
 #define VERSION "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@"
 
@@ -45,4 +45,3 @@
 #cmakedefine HAVE_ICONV
 
 #endif
-

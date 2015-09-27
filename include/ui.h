@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_UI_H__
+#define __SIMPLETIN_UI_H__
+
 #include "unicode.h"
 
 int ui_sep_input;
@@ -45,3 +48,5 @@ printffunc *user_title;
 voidfunc *user_resize;
 voidfunc *user_show_status;
 voidfunc *user_mark_greeting;
+
+#endif /* end of include guard: __SIMPLETIN_UI_H__ */

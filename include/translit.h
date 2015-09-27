@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_TRANSLIT_H__
+#define __SIMPLETIN_TRANSLIT_H__
+
 #define TRANSLIT_MIN 0x00A0
 #define TRANSLIT_MAX 0x25EF
 static char tlits[]= {
@@ -2864,3 +2867,5 @@ static char tlits[]= {
     /* U+25EE */	BAD_CHAR,  	/* UP-POINTING TRIANGLE WITH RIGHT HALF BLACK */
     /* U+25EF */	'O',       	/* LARGE CIRCLE */
 };
+
+#endif /* end of include guard: __SIMPLETIN_TRANSLIT_H__ */

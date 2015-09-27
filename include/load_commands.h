@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_LOAD_COMMANDS_H__
+#define __SIMPLETIN_LOAD_COMMANDS_H__
+
 add_command(c_commands, "all", (t_command)all_command);
 add_command(c_commands, "session", (t_command)session_command);
 add_command(c_commands, "sslsession", (t_command)sslsession_command);
@@ -148,3 +151,5 @@ add_command(commands, "gmtime", gmtime_command);
 add_command(commands, "ctoi", ctoi_command);
 add_command(commands, "loginputformat", loginputformat_command);
 add_command(commands, "initvariable", initvariable_command);
+
+#endif /* end of include guard: __SIMPLETIN_LOAD_COMMANDS_H__ */

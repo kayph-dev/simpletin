@@ -1,3 +1,6 @@
+#ifndef __SIMPLETIN_LLIST_H__
+#define __SIMPLETIN_LLIST_H__
+
 struct listnode* init_list(void);
 void kill_list(struct listnode *nptr);
 void zap_list(struct listnode *nptr);
@@ -13,3 +16,5 @@ void show_list_action(struct listnode *listhead);
 struct listnode* search_node_with_wild(struct listnode *listhead, char *cptr);
 void addnode_list(struct listnode *listhead, char *ltext, char *rtext, char *prtext);
 int count_list(struct listnode *listhead);
+
+#endif /* end of include guard: __SIMPLETIN_LLIST_H__ */
