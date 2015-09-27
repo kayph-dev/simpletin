@@ -611,13 +611,8 @@ static void tintin(void)
         }
         result = select(maxfd+1, &readfdmask, 0, 0, &tv);
 
-        if (need_resize) {
-            char buf[BUFFER_SIZE];
-
+        if (need_resize)
             user_resize();
-            sprintf(buf, "#NEW SCREEN SIZE: %dx%d.", COLS, LINES);
-            tintin_puts1(buf, activesession);
-        }
 
         if (result == 0)
             continue;
