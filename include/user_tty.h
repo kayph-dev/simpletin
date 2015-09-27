@@ -1,0 +1,1 @@
+void usertty_initdriver();

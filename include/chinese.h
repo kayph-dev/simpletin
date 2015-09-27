@@ -1,0 +1,1 @@
+void ctoi(char* input);
