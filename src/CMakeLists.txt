@@ -102,11 +102,14 @@ find_package(Socket)
 find_package(GnuTLS)
 find_package(ZLIB)
 find_package(PCRE REQUIRED)
+find_package(Lua51 REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
-    ${PCRE_LIBRARIES})
+    ${PCRE_LIBRARIES}
+    ${LUA_LIBRARIES})
 
-include_directories(${PCRE_INCLUDE_DIRS})
+include_directories(${PCRE_INCLUDE_DIRS}
+    ${LUA_INCLUDE_DIR})
 
 if (UTIL_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Util_LIBRARY})
