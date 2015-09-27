@@ -99,6 +99,11 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 99)
 
+# generate helpfile.
+add_custom_command(TARGET ${PROJECT_NAME}
+    PRE_BUILD
+    COMMAND gzip -n9 < ${PROJECT_SOURCE_DIR}/data/kbtin_help.in > ${PROJECT_BINARY_DIR}/KBtin_help.gz)
+
 find_package(GLIB2)
 find_package(Util)
 find_package(Nsl)
