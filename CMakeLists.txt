@@ -96,6 +96,9 @@ find_file(HAVE_DEV_PTMX NAMES /dev/ptmx PATHS / NO_DEFAULT_PATH)
 test_big_endian(WORDS_BIGENDIAN)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(ansi2html ansi2html.c)
+add_executable(ansi2txt ansi2txt.c)
+add_executable(ttyrec2ansi ttyrec2ansi.c)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 99)
 
