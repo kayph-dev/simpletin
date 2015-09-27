@@ -29,10 +29,8 @@ void kill_hash(struct hashtable* h)
     int i;
 
     if (h->nval)
-        for (i=0; i<h->size; i++)
-        {
-            if (h->tab[i].left && (h->tab[i].left!=DELETED_HASHENTRY))
-            {
+        for (i=0; i<h->size; i++) {
+            if (h->tab[i].left && (h->tab[i].left!=DELETED_HASHENTRY)) {
                 SFREE(h->tab[i].left);
                 SFREE(h->tab[i].right);
             }
@@ -46,8 +44,7 @@ static inline void add_hash_value(struct hashtable *h, char *left, char *right)
 {
     int i;
     i=crc(left)%h->size;
-    while (h->tab[i].left)
-    {
+    while (h->tab[i].left) {
         if (!i)
             i=h->size-1;
         i--;
@@ -68,8 +65,7 @@ static inline void rehash(struct hashtable *h, int s)
     h->tab=CALLOC(s, struct hashentry);
     h->nent=h->nval;
     h->size=s;
-    for (i=0;i<gs;i++)
-    {
+    for (i=0; i<gs; i++) {
         if (gt[i].left && gt[i].left!=DELETED_HASHENTRY)
             add_hash_value(h, gt[i].left, gt[i].right);
     }
@@ -89,13 +85,11 @@ void set_hash(struct hashtable *h, char *key, char *value)
         rehash(h, h->nval*3);
     j=-1;
     i=crc(key)%h->size;
-    while (h->tab[i].left)
-    {
+    while (h->tab[i].left) {
         if (h->tab[i].left==DELETED_HASHENTRY)
             if (j==-1)
                 j=i;
-        if (!strcmp(h->tab[i].left, key))
-        {
+        if (!strcmp(h->tab[i].left, key)) {
             SFREE(h->tab[i].right);
             h->tab[i].right=mystrdup(value);
             return;
@@ -122,13 +116,11 @@ void set_hash_nostring(struct hashtable *h, char *key, char *value)
         rehash(h, h->nval*3);
     j=-1;
     i=crc(key)%h->size;
-    while (h->tab[i].left)
-    {
+    while (h->tab[i].left) {
         if (h->tab[i].left==DELETED_HASHENTRY)
             if (j==-1)
                 j=i;
-        if (!strcmp(h->tab[i].left, key))
-        {
+        if (!strcmp(h->tab[i].left, key)) {
             h->tab[i].right=value;
             return;
         }
@@ -155,10 +147,8 @@ char* get_hash(struct hashtable *h, char *key)
     int i;
 
     i=crc(key)%h->size;
-    while (h->tab[i].left)
-    {
-        if (h->tab[i].left!=DELETED_HASHENTRY&&(!strcmp(h->tab[i].left, key)))
-        {
+    while (h->tab[i].left) {
+        if (h->tab[i].left!=DELETED_HASHENTRY&&(!strcmp(h->tab[i].left, key))) {
             return h->tab[i].right;
         }
         if (!i)
@@ -178,10 +168,8 @@ int delete_hash(struct hashtable *h, char *key)
     int i;
 
     i=crc(key)%h->size;
-    while (h->tab[i].left)
-    {
-        if (h->tab[i].left!=DELETED_HASHENTRY&&(!strcmp(h->tab[i].left, key)))
-        {
+    while (h->tab[i].left) {
+        if (h->tab[i].left!=DELETED_HASHENTRY&&(!strcmp(h->tab[i].left, key))) {
             SFREE(h->tab[i].left);
             SFREE(h->tab[i].right);
             h->tab[i].left=DELETED_HASHENTRY;
@@ -210,25 +198,19 @@ static struct listnode* merge_lists(struct listnode* a, struct listnode* b)
         return b;
     if (!b)
         return a;
-    if (strcmp(a->left,b->left)<=0)
-    {
+    if (strcmp(a->left,b->left)<=0) {
         c0=c=a;
         a=a->next;
-    }
-    else
-    {
+    } else {
         c0=c=b;
         b=b->next;
     }
     while (a && b)
-        if (strcmp(a->left,b->left)<=0)
-        {
+        if (strcmp(a->left,b->left)<=0) {
             c->next=a;
             c=a;
             a=a->next;
-        }
-        else
-        {
+        } else {
             c->next=b;
             c=b;
             b=b->next;
@@ -254,20 +236,18 @@ struct listnode* hash2list(struct hashtable *h, char *pat)
     struct listnode *l;
     int i,j;
 
-    for (j=0;j<NBITS;j++)
+    for (j=0; j<NBITS; j++)
         p[j]=0;
-    for (i=0;i<h->size;i++)
+    for (i=0; i<h->size; i++)
         if (h->tab[i].left && (h->tab[i].left!=DELETED_HASHENTRY)
-            && match(pat, h->tab[i].left))
-        {
+                && match(pat, h->tab[i].left)) {
             if (!(l=TALLOC(struct listnode)))
                 syserr("couldn't malloc listhead");
             l->left = h->tab[i].left;
             l->right= h->tab[i].right;
             l->pr   = 0;
             l->next = 0;
-            for (j=0; p[j]; j++)     /* if j>=NBITS, we have a bug anyway */
-            {
+            for (j=0; p[j]; j++) {   /* if j>=NBITS, we have a bug anyway */
                 l=merge_lists(p[j], l);
                 p[j]=0;
             }

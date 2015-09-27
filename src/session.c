@@ -69,20 +69,18 @@ void make_name(char *str, char *basis, int run)
     if (!session_exists(str))
         return;
     i=2;
-    do sprintf(t, "%d", i++); while (session_exists(str));
+    do sprintf(t, "%d", i++);
+    while (session_exists(str));
     return;
 noname:
-    for (i=1; ; i++)
-    {
+    for (i=1; ; i++) {
         j=i;
         *(t=str+10)=0;
-        do
-        {
+        do {
             *--t='a'+(j-1)%('z'+1-'a');
             j=(j-1)/('z'+1-'a');
         } while (j);
-        if (!session_exists(t))
-        {
+        if (!session_exists(t)) {
             strcpy(str, t);
             return;
         }
@@ -102,32 +100,24 @@ static int list_sessions(char *arg,struct session *ses,char *left,char *right)
     arg = get_arg_in_braces(arg, left, 0);
     arg = get_arg_in_braces(arg, right, 1);
 
-    if (!*left)
-    {
+    if (!*left) {
         tintin_puts("#THESE SESSIONS HAS BEEN DEFINED:", ses);
         for (sesptr = sessionlist; sesptr; sesptr = sesptr->next)
             if (sesptr!=nullsession)
                 show_session(sesptr);
         prompt(ses);
-    }
-    else if (*left && !*right)
-    {
+    } else if (*left && !*right) {
         for (sesptr = sessionlist; sesptr; sesptr = sesptr->next)
-            if (!strcmp(sesptr->name, left))
-            {
+            if (!strcmp(sesptr->name, left)) {
                 show_session(sesptr);
                 break;
             }
-        if (sesptr == NULL)
-        {
+        if (sesptr == NULL) {
             tintin_puts("#THAT SESSION IS NOT DEFINED.", ses);
             prompt(NULL);
         }
-    }
-    else
-    {
-        if (session_exists(left))
-        {
+    } else {
+        if (session_exists(left)) {
             tintin_eprintf(ses,"#THERE'S A SESSION WITH THAT NAME ALREADY.");
             prompt(NULL);
             return 1;
@@ -154,8 +144,7 @@ static struct session *socket_session(char *arg, struct session *ses, int ssl)
 
     strcpy(host, space_out(right));
 
-    if (!*host)
-    {
+    if (!*host) {
         tintin_eprintf(ses,"#session: HEY! SPECIFY AN ADDRESS WILL YOU?");
         return ses;
     }
@@ -163,14 +152,12 @@ static struct session *socket_session(char *arg, struct session *ses, int ssl)
     port=host;
     while (*port && !isaspace(*port))
         port++;
-    if (*port)
-    {
+    if (*port) {
         *port++ = '\0';
         port = space_out(port);
     }
 
-    if (!*port)
-    {
+    if (!*port) {
         tintin_eprintf(ses, "#session: HEY! SPECIFY A PORT NUMBER WILL YOU?");
         return ses;
     }
@@ -178,10 +165,8 @@ static struct session *socket_session(char *arg, struct session *ses, int ssl)
         return ses;
 
 #ifdef HAVE_GNUTLS
-    if (ssl)
-    {
-        if (!(sslses=ssl_negotiate(sock, host, ses)))
-        {
+    if (ssl) {
+        if (!(sslses=ssl_negotiate(sock, host, ses))) {
             close(sock);
             return ses;
         }
@@ -219,15 +204,13 @@ struct session *run_command(char *arg,struct session *ses)
     if (list_sessions(arg,ses,left,right))
         return ses;     /* (!*left)||(!*right) */
 
-    if (!*right)
-    {
+    if (!*right) {
         tintin_eprintf(ses, "#run: HEY! SPECIFY AN COMMAND, WILL YOU?");
         return ses;
     };
 
     utf8_to_local(ustr, right);
-    if ((sock=run(ustr)) == -1)
-    {
+    if ((sock=run(ustr)) == -1) {
         tintin_eprintf(ses, "#forkpty() FAILED: %s", strerror(errno));
         return ses;
     }
@@ -261,16 +244,13 @@ struct session *newactive_session(void)
 {
     if ((activesession=sessionlist)==nullsession)
         activesession=activesession->next;
-    if (activesession)
-    {
+    if (activesession) {
         char buf[BUFFER_SIZE];
 
         sprintf(buf, "#SESSION '%s' ACTIVATED.", activesession->name);
         tintin_puts1(buf, activesession);
         return do_hook(activesession, HOOK_ACTIVATE, 0, 0);
-    }
-    else
-    {
+    } else {
         activesession=nullsession;
         tintin_puts1("#THERE'S NO ACTIVE SESSION NOW.", activesession);
         return do_hook(activesession, HOOK_ACTIVATE, 0, 0);
@@ -344,14 +324,13 @@ static struct session *new_session(char *name, char *address, int sock, int isso
     newsession->debuglogname=0;
     newsession->partial_line_marker = mystrdup(ses->partial_line_marker);
     memcpy(newsession->mesvar, ses->mesvar, sizeof(int)*(MAX_MESVAR+1));
-    for (i=0;i<MAX_LOCATIONS;i++)
-    {
+    for (i=0; i<MAX_LOCATIONS; i++) {
         newsession->routes[i]=0;
         newsession->locations[i]=0;
     };
     copyroutes(ses,newsession);
     newsession->last_line[0]=0;
-    for (i=0;i<NHOOKS;i++)
+    for (i=0; i<NHOOKS; i++)
         if (ses->hooks[i])
             newsession->hooks[i]=mystrdup(ses->hooks[i]);
         else
@@ -359,7 +338,7 @@ static struct session *new_session(char *name, char *address, int sock, int isso
     newsession->closing=0;
     newsession->charset = mystrdup(issocket ? ses->charset : user_charset_name);
     newsession->logcharset = logcs_is_special(ses->logcharset) ?
-                              ses->logcharset : mystrdup(ses->logcharset);
+                             ses->logcharset : mystrdup(ses->logcharset);
     if (!new_conv(&newsession->c_io, newsession->charset, 0))
         tintin_eprintf(0, "#Warning: can't open charset: %s", newsession->charset);
     nullify_conv(&newsession->c_log);
@@ -391,13 +370,11 @@ void cleanup_session(struct session *ses)
     kill_all(ses, END);
     if (ses == sessionlist)
         sessionlist = ses->next;
-    else
-    {
+    else {
         for (sesptr = sessionlist; sesptr->next != ses; sesptr = sesptr->next) ;
         sesptr->next = ses->next;
     }
-    if (ses==activesession)
-    {
+    if (ses==activesession) {
         user_textout_draft(0, 0);
         sprintf(buf,"%s\n",ses->last_line);
         convert(&ses->c_io, ses->last_line, buf, -1);
@@ -414,7 +391,7 @@ void cleanup_session(struct session *ses)
         fclose(ses->debuglogfile);
     SFREE(ses->loginputprefix);
     SFREE(ses->loginputsuffix);
-    for (i=0;i<NHOOKS;i++)
+    for (i=0; i<NHOOKS; i++)
         SFREE(ses->hooks[i]);
     SFREE(ses->name);
     SFREE(ses->address);
@@ -424,8 +401,7 @@ void cleanup_session(struct session *ses)
     if (!logcs_is_special(ses->logcharset))
         SFREE(ses->logcharset);
 #ifdef HAVE_ZLIB
-    if (ses->mccp)
-    {
+    if (ses->mccp) {
         inflateEnd(ses->mccp);
         TFREE(ses->mccp, z_stream);
     }
@@ -444,21 +420,19 @@ void seslist(char *result)
     int flag=0;
     char *r0=result;
 
-    if ((sessionlist!=nullsession)||(nullsession->next))
-    {
+    if ((sessionlist!=nullsession)||(nullsession->next)) {
         for (sesptr = sessionlist; sesptr; sesptr = sesptr->next)
-            if (sesptr!=nullsession)
-            {
+            if (sesptr!=nullsession) {
                 if (flag)
                     *result++=' ';
                 else
                     flag=1;
                 if (isatom(sesptr->name))
                     result+=snprintf(result, BUFFER_SIZE-5+r0-result,
-                        "%s",sesptr->name);
+                                     "%s",sesptr->name);
                 else
                     result+=snprintf(result, BUFFER_SIZE-5+r0-result,
-                        "{%s}",sesptr->name);
+                                     "{%s}",sesptr->name);
                 if (result-r0>BUFFER_SIZE-10)
                     return; /* pathological session names */
             }

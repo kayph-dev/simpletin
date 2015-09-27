@@ -40,8 +40,7 @@ void kill_list(struct listnode *nptr)
     nexttodel = nptr->next;
     LFREE(nptr);
 
-    for (nptr = nexttodel; nptr; nptr = nexttodel)
-    {
+    for (nptr = nexttodel; nptr; nptr = nexttodel) {
         nexttodel = nptr->next;
         SFREE(nptr->left);
         SFREE(nptr->right);
@@ -63,8 +62,7 @@ void zap_list(struct listnode *nptr)
     nexttodel = nptr->next;
     LFREE(nptr);
 
-    for (nptr = nexttodel; nptr; nptr = nexttodel)
-    {
+    for (nptr = nexttodel; nptr; nptr = nexttodel) {
         nexttodel = nptr->next;
         LFREE(nptr);
     }
@@ -76,11 +74,9 @@ void zap_list(struct listnode *nptr)
 ********************************************************************/
 void kill_all(struct session *ses, int mode)
 {
-    switch (mode)
-    {
+    switch (mode) {
     case CLEAN:
-        if (ses != NULL)
-        {
+        if (ses != NULL) {
             kill_hash(ses->aliases);
             ses->aliases = init_hash();
             kill_list(ses->actions);
@@ -104,17 +100,15 @@ void kill_all(struct session *ses, int mode)
             kill_routes(ses);
             tintin_printf(ses,"#Lists cleared.");
             prompt(NULL);
-        }
-        else
-        {       /* can't happen */
+        } else {
+            /* can't happen */
             tintin_printf(0,"#Can't clean the common lists (yet).");
             prompt(NULL);
         }
         break;
 
     case END:
-        if (ses != NULL)
-        {
+        if (ses != NULL) {
             kill_hash(ses->aliases);
             kill_list(ses->actions);
             kill_list(ses->prompts);
@@ -155,8 +149,7 @@ static int prioritycmp(char *a, char *b)
     int res;
 
 not_numeric:
-    while (*a && *a==*b && !isadigit(*a))
-    {
+    while (*a && *a==*b && !isadigit(*a)) {
         a++;
         b++;
     }
@@ -169,8 +162,7 @@ not_numeric:
     while (*b=='0')
         b++;
     res=0;
-    while (isadigit(*a))
-    {
+    while (isadigit(*a)) {
         if (!isadigit(*b))
             return 1;
         if (*a!=*b && !res)
@@ -206,24 +198,17 @@ void insertnode_list(struct listnode *listhead, char *ltext, char *rtext, char *
         strcpy(newnode->pr, prtext);
 
     nptr = listhead;
-    switch (mode)
-    {
+    switch (mode) {
     case PRIORITY:
-        while ((nptrlast = nptr) && (nptr = nptr->next))
-        {
-            if (prioritycmp(prtext, nptr->pr) < 0)
-            {
+        while ((nptrlast = nptr) && (nptr = nptr->next)) {
+            if (prioritycmp(prtext, nptr->pr) < 0) {
                 newnode->next = nptr;
                 nptrlast->next = newnode;
                 return;
-            }
-            else if (prioritycmp(prtext, nptr->pr) == 0)
-            {
+            } else if (prioritycmp(prtext, nptr->pr) == 0) {
                 while ((nptrlast) && (nptr) &&
-                        (prioritycmp(prtext, nptr->pr) == 0))
-                {
-                    if (prioritycmp(ltext, nptr->left) <= 0)
-                    {
+                        (prioritycmp(prtext, nptr->pr) == 0)) {
+                    if (prioritycmp(ltext, nptr->left) <= 0) {
                         newnode->next = nptr;
                         nptrlast->next = newnode;
                         return;
@@ -244,22 +229,16 @@ void insertnode_list(struct listnode *listhead, char *ltext, char *rtext, char *
 
     case LENGTH:
         ln=strlen(ltext);
-        while ((nptrlast = nptr) && (nptr = nptr->next))
-        {
+        while ((nptrlast = nptr) && (nptr = nptr->next)) {
             lo=strlen(nptr->left);
-            if (ln<lo)
-            {
+            if (ln<lo) {
                 newnode->next = nptr;
                 nptrlast->next = newnode;
                 return;
-            }
-            else if (ln==lo)
-            {
+            } else if (ln==lo) {
                 while ((nptrlast) && (nptr) &&
-                        (ln==lo))
-                {
-                    if (prioritycmp(ltext, nptr->left) <= 0)
-                    {
+                        (ln==lo)) {
+                    if (prioritycmp(ltext, nptr->left) <= 0) {
                         newnode->next = nptr;
                         nptrlast->next = newnode;
                         return;
@@ -280,10 +259,8 @@ void insertnode_list(struct listnode *listhead, char *ltext, char *rtext, char *
 
 
     case ALPHA:
-        while ((nptrlast = nptr) && (nptr = nptr->next))
-        {
-            if (strcmp(ltext, nptr->left) <= 0)
-            {
+        while ((nptrlast = nptr) && (nptr = nptr->next)) {
+            if (strcmp(ltext, nptr->left) <= 0) {
                 newnode->next = nptr;
                 nptrlast->next = newnode;
                 return;
@@ -303,10 +280,8 @@ void deletenode_list(struct listnode *listhead, struct listnode *nptr)
 {
     struct listnode *lastnode = listhead;
 
-    while ((listhead = listhead->next))
-    {
-        if (listhead == nptr)
-        {
+    while ((listhead = listhead->next)) {
+        if (listhead == nptr) {
             lastnode->next = listhead->next;
             SFREE(listhead->left);
             SFREE(listhead->right);
@@ -327,8 +302,7 @@ struct listnode* searchnode_list(struct listnode *listhead, char *cptr)
 {
     int i;
 
-    while ((listhead = listhead->next))
-    {
+    while ((listhead = listhead->next)) {
         if ((i = strcmp(listhead->left, cptr)) == 0)
             return listhead;
         /* CHANGED to fix bug when list isn't alphabetically sorted
@@ -370,8 +344,7 @@ void show_list_action(struct listnode *listhead)
 
 struct listnode* search_node_with_wild(struct listnode *listhead, char *cptr)
 {
-    while ((listhead = listhead->next))
-    {
+    while ((listhead = listhead->next)) {
         /* CHANGED to fix silly globbing behavior
            if (check_one_node(listhead->left, cptr))
          */

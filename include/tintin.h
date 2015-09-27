@@ -65,7 +65,7 @@
 #define LOG_INPUT_SUFFIX ""
 #define RESET_RAW       /* reset pseudo-terminals to raw mode every write */
 #define GOTO_CHAR '>'   /* be>mt -> #goto be mt */
-                        /*Comment last line out to disable this behavior */
+/*Comment last line out to disable this behavior */
 #define OLD_LOG 0 /* set to one to use old-style logging */
 #define DEFAULT_LOGTYPE (1-OLD_LOG)       /* 0: cr/lf, 1: lf, 2: ttyrec */
 #define DEFAULT_OPEN '{' /*character that starts an argument */
@@ -102,8 +102,8 @@
 #define DEFAULT_ECHO_NOSEPINPUT FALSE     /* echo when input is not managed */
 #define DEFAULT_IGNORE FALSE              /* ignore */
 #define DEFAULT_SPEEDWALK FALSE           /* speedwalk */
-        /* note: classic speedwalks are possible only on some primitive
-           MUDs with only 4 basic directions (w,e,n,s)                   */
+/* note: classic speedwalks are possible only on some primitive
+   MUDs with only 4 basic directions (w,e,n,s)                   */
 #define DEFAULT_PRESUB FALSE              /* presub before actions */
 #define DEFAULT_TOGGLESUBS FALSE          /* turn subs on and off FALSE=ON*/
 #define DEFAULT_KEYPAD FALSE              /* start in standard keypad mode */
@@ -249,41 +249,35 @@
 #endif
 
 /************************ structures *********************/
-struct listnode
-{
+struct listnode {
     struct listnode *next;
     char *left, *right, *pr;
 };
 
-struct hashentry
-{
+struct hashentry {
     char *left;
     char *right;
 };
 
-struct hashtable
-{
+struct hashtable {
     int size;               /* allocated size */
     int nent;               /* current number of entries */
     int nval;               /* current number of values (entries-deleted) */
     struct hashentry *tab;  /* entries table */
 };
 
-struct completenode
-{
+struct completenode {
     struct completenode *next;
     char *strng;
 };
 
-struct eventnode
-{
+struct eventnode {
     struct eventnode *next;
     char *event;
     time_t time;
 };
 
-struct routenode
-{
+struct routenode {
     struct routenode *next;
     int dest;
     char *path;
@@ -291,16 +285,14 @@ struct routenode
     char *cond;
 };
 
-struct charset_conv
-{
+struct charset_conv {
     char *name;
     int mode; /* 0=8bit, 1=UTF-8, 2=iconv */
     int dir; /* -1=only in, 0=both, 1=only out */
     iconv_t i_in, i_out;
 };
 
-struct session
-{
+struct session {
     struct session *next;
     char *name;
     char *address;
@@ -376,8 +368,7 @@ typedef char pvars_t[10][BUFFER_SIZE];
 #endif
 #define from_little_endian(x) to_little_endian(x)
 
-struct ttyrec_header
-{
+struct ttyrec_header {
     uint32_t sec;
     uint32_t usec;
     uint32_t len;

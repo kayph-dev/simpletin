@@ -6,8 +6,7 @@
 
 /* crctab calculated by Mark G. Mendel, Network Systems Corporation */
 #if 0
-static unsigned short crctab[256] =
-{
+static unsigned short crctab[256] = {
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
     0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
     0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -95,8 +94,8 @@ static unsigned short crctab[256] =
 /*     using byte-swap instructions.                                   */
 
 #ifdef NEED_CRC_TABLE
-static long cr3tab[] =
-{                               /* CRC polynomial 0xedb88320 */
+static long cr3tab[] = {
+    /* CRC polynomial 0xedb88320 */
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
     0xe963a535, 0x9e6495a3,
     0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd,
@@ -166,7 +165,7 @@ static long cr3tab[] =
 
 #ifdef NFGM
 static long UPDC32(b, c)
-    long c;
+long c;
 {
     return cr3tab[((int) c ^ b) & 0xff] ^ ((c >> 8) & 0x00FFFFFF);
 }
@@ -178,7 +177,7 @@ static long UPDC32(b, c)
 int crc32s(char *str)
 {
     register int c=0xffffffff;
-    for (;*str;str++)
+    for (; *str; str++)
         c=UPDC32(*str,c);
     return c;
 }

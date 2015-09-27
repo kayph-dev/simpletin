@@ -11,8 +11,7 @@ gnutls_session_t ssl_negotiate(int sock, char *host, struct session *oldses)
     gnutls_session_t sslses;
     int ret;
 
-    if (!ssl_cred)
-    {
+    if (!ssl_cred) {
         gnutls_global_init();
         gnutls_certificate_allocate_credentials(&ssl_cred);
     }
@@ -20,18 +19,15 @@ gnutls_session_t ssl_negotiate(int sock, char *host, struct session *oldses)
     gnutls_set_default_priority(sslses);
     gnutls_credentials_set(sslses, GNUTLS_CRD_CERTIFICATE, ssl_cred);
     gnutls_transport_set_ptr(sslses, (gnutls_transport_ptr_t)(intptr_t)sock);
-    do
-    {
+    do {
         ret=gnutls_handshake(sslses);
     } while (ret==GNUTLS_E_AGAIN || ret==GNUTLS_E_INTERRUPTED);
-    if (ret)
-    {
+    if (ret) {
         tintin_eprintf(oldses, "#SSL handshake failed: %s", gnutls_strerror(ret));
         gnutls_deinit(sslses);
         return 0;
     }
-    if (!ssl_check_cert(sslses, host, oldses))
-    {
+    if (!ssl_check_cert(sslses, host, oldses)) {
         gnutls_deinit(sslses);
         return 0;
     }
@@ -46,13 +42,11 @@ static int cert_file(char *name, char *respath)
     if (!*name || *name=='.')   // no valid hostname starts with a dot
         return 0;
     fn=fname;
-    while (1)
-    {
+    while (1) {
         if (!*name)
             break;
 #ifdef WIN32
-        else if (*name==':')
-        {
+        else if (*name==':') {
             name++;
             *fn++='.';
         }
@@ -88,8 +82,7 @@ static void load_cert(gnutls_x509_crt_t *cert, char *name)
     fclose(f);
 
     gnutls_x509_crt_init(cert);
-    if (gnutls_x509_crt_import(*cert, &bptr, GNUTLS_X509_FMT_PEM))
-    {
+    if (gnutls_x509_crt_import(*cert, &bptr, GNUTLS_X509_FMT_PEM)) {
         gnutls_x509_crt_deinit(*cert);
         *cert=0;
     }
@@ -108,15 +101,13 @@ static void save_cert(gnutls_x509_crt_t cert, char *name, int new, struct sessio
     if (!(home=getenv("HOME")))
         home=".";
     snprintf(fname, BUFFER_SIZE, "%s/%s", home, CONFIG_DIR);
-    if (mkdir(fname, 0777) && errno!=EEXIST)
-    {
+    if (mkdir(fname, 0777) && errno!=EEXIST) {
         tintin_eprintf(oldses, "#Cannot create config dir (%s): %s", fname, strerror(errno));
         return;
     }
     snprintf(fname, BUFFER_SIZE, "%s/%s/%s", home, CONFIG_DIR, CERT_DIR);
     mkdir(fname, 0755);
-    if (mkdir(fname, 0755) && errno!=EEXIST)
-    {
+    if (mkdir(fname, 0755) && errno!=EEXIST) {
         tintin_eprintf(oldses, "#Cannot create certs dir (%s): %s", fname, strerror(errno));
         return;
     }
@@ -125,13 +116,11 @@ static void save_cert(gnutls_x509_crt_t cert, char *name, int new, struct sessio
     if (new)
         tintin_printf(oldses, "#It is the first time you connect to this server.");
     tintin_printf(oldses, "#Saving server certificate to %s", fname);
-    if (!(f=fopen(fname, "w")))
-    {
+    if (!(f=fopen(fname, "w"))) {
         tintin_eprintf(oldses, "#Save failed: %s", strerror(errno));
         return;
     }
-    if (fwrite(buf, 1, len, f)!=len)
-    {
+    if (fwrite(buf, 1, len, f)!=len) {
         tintin_eprintf(oldses, "#Save failed: %s", strerror(errno));
         fclose(f);
         unlink(fname);
@@ -170,72 +159,61 @@ static int ssl_check_cert(gnutls_session_t sslses, char *host, struct session *o
     oldcert=0;
     load_cert(&oldcert, host);
 
-    if (gnutls_certificate_type_get(sslses)!=GNUTLS_CRT_X509)
-    {
+    if (gnutls_certificate_type_get(sslses)!=GNUTLS_CRT_X509) {
         err="server doesn't use x509 -> no key retention.";
         goto nocert;
     }
 
-    if (!(cert_list = gnutls_certificate_get_peers(sslses, &cert_list_size)))
-    {
+    if (!(cert_list = gnutls_certificate_get_peers(sslses, &cert_list_size))) {
         err="server has no x509 certificate -> no key retention.";
         goto nocert;
     }
 
     gnutls_x509_crt_init(&cert);
-    if (gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER)<0)
-    {
+    if (gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER)<0) {
         err="server's certificate is invalid.";
         goto badcert;
     }
 
     t=time(0);
-    if (gnutls_x509_crt_get_activation_time(cert)>t)
-    {
+    if (gnutls_x509_crt_get_activation_time(cert)>t) {
         snprintf(buf2, BUFFER_SIZE, "%s", ctime(&t));
         if ((bptr=strchr(buf2, '\n')))
             *bptr=0;
         snprintf(fname, BUFFER_SIZE, "certificate activation time is in the future (%s).",
-            buf2);
+                 buf2);
         err=fname;
     }
 
-    if (gnutls_x509_crt_get_expiration_time(cert)<t)
-    {
+    if (gnutls_x509_crt_get_expiration_time(cert)<t) {
         snprintf(buf2, BUFFER_SIZE, "%s", ctime(&t));
         if ((bptr=strchr(buf2, '\n')))
             *bptr=0;
         snprintf(fname, BUFFER_SIZE, "certificate has expired (on %s).",
-            buf2);
+                 buf2);
         err=fname;
     }
 
     if (!oldcert)
         save_cert(cert, host, 1, oldses);
-    else if (diff_certs(cert, oldcert))
-    {
+    else if (diff_certs(cert, oldcert)) {
         t-=gnutls_x509_crt_get_expiration_time(oldcert);
-        if (err)
-        {
+        if (err) {
             snprintf(buf2, BUFFER_SIZE, "certificate mismatch, and new %s",
                      err);
             err=buf2;
-        }
-        else if (t<-7*24*3600)
+        } else if (t<-7*24*3600)
             err = "the server certificate is different from the saved one.";
-        else
-        {
+        else {
             tintin_printf(oldses, (t>0)?
-                "#SSL notice: server certificate has changed, but the old one was expired.":
-                "#SSL notice: server certificate has changed, but the old one was about to expire.");
+                          "#SSL notice: server certificate has changed, but the old one was expired.":
+                          "#SSL notice: server certificate has changed, but the old one was about to expire.");
             /* Replace the old cert */
             save_cert(cert, host, 0, oldses);
             gnutls_x509_crt_deinit(oldcert);
             oldcert=0;
         }
-    }
-    else
-    {
+    } else {
         /* All ok */
         gnutls_x509_crt_deinit(oldcert);
         oldcert=0;
@@ -250,8 +228,7 @@ nocert:
         gnutls_x509_crt_deinit(oldcert);
     if (!err)
         return 1;
-    if (oldcert)
-    {
+    if (oldcert) {
         tintin_eprintf(oldses, "#SSL error: %s", err);
         tintin_eprintf(oldses, "############################################################");
         tintin_eprintf(oldses, "##################### SECURITY ALERT #######################");
@@ -265,14 +242,12 @@ nocert:
         tintin_eprintf(oldses, "# server is kosher.  To continue, please delete the file:  #");
         if (cert_file(host, fname))
             tintin_eprintf(oldses, "# %-57s#", fname);
-        else
-            {} /* can't happen */
+        else {
+        } /* can't happen */
         tintin_eprintf(oldses, "############################################################");
         tintin_eprintf(oldses, "#Aborting connection!");
         return 0;
-    }
-    else
-    {
+    } else {
         tintin_printf(oldses, "#SSL warning: %s", err);
         tintin_printf(oldses, "#You may be vulnerable to Man-in-the-Middle attacks.");
         return 2;

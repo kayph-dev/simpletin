@@ -19,8 +19,7 @@ void tintin_puts(char *cptr, struct session *ses)
 {
     char line[BUFFER_SIZE];
     strcpy(line,cptr);
-    if (ses)
-    {
+    if (ses) {
         _=line;
         check_all_actions(line, ses);
         _=0;
@@ -49,8 +48,7 @@ void tintin_puts1(char *cptr, struct session *ses)
     if (!ses->togglesubs)
         do_all_high(line, ses);
     if (isnotblank(line,ses->blank))
-        if (ses==activesession)
-        {
+        if (ses==activesession) {
             cptr=strchr(line,0);
             if (cptr-line>=BUFFER_SIZE-2)
                 cptr=line+BUFFER_SIZE-2;
@@ -66,8 +64,7 @@ void tintin_printf(struct session *ses, const char *format, ...)
     va_list ap;
     char buf[BUFFER_SIZE];
 
-    if ((ses == activesession || ses == nullsession || !ses) && puts_echoing)
-    {
+    if ((ses == activesession || ses == nullsession || !ses) && puts_echoing) {
         va_start(ap, format);
         if (vsnprintf(buf, BUFFER_SIZE-1, format, ap)>BUFFER_SIZE-2)
             buf[BUFFER_SIZE-3]='>';
@@ -83,8 +80,7 @@ void tintin_eprintf(struct session *ses, const char *format, ...)
     char buf[BUFFER_SIZE];
 
     /* note: the behavior on !ses is wrong */
-    if ((ses == activesession || ses == nullsession || !ses) && (puts_echoing||!ses||ses->mesvar[11]))
-    {
+    if ((ses == activesession || ses == nullsession || !ses) && (puts_echoing||!ses||ses->mesvar[11])) {
         va_start(ap, format);
         if (vsnprintf(buf, BUFFER_SIZE-1, format, ap)>BUFFER_SIZE-2)
             buf[BUFFER_SIZE-3]='>';

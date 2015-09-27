@@ -32,43 +32,34 @@ static void parse_sub(char *arg,int gag,struct session *ses)
 
     if (!*left && !*right)
         strcpy(left, "*");
-    if (!*right)
-    {
+    if (!*right) {
         while ((mysubs = search_node_with_wild(mysubs, left)) != NULL)
-            if (gag)
-            {
-                if (!strcmp(mysubs->right, EMPTY_LINE))
-                {
+            if (gag) {
+                if (!strcmp(mysubs->right, EMPTY_LINE)) {
                     if (!flag)
                         tintin_printf(ses,"#THESE GAGS HAVE BEEN DEFINED:");
                     tintin_printf(ses, "{%s~7~}", mysubs->left);
                     flag=1;
                 }
-            }
-            else
-            {
+            } else {
                 if (!flag)
                     tintin_printf(ses,"#THESE SUBSTITUTES HAVE BEEN DEFINED:");
                 flag=1;
                 shownode_list(mysubs);
             }
-        if (!flag && ses->mesvar[2])
-        {
+        if (!flag && ses->mesvar[2]) {
             if (strcmp(left,"*"))
                 tintin_printf(ses, "#THAT %s IS NOT DEFINED.", gag? "GAG":"SUBSTITUTE");
             else
                 tintin_printf(ses, "#NO %sS HAVE BEEN DEFINED.", gag? "GAG":"SUBSTITUTE");
         }
         prompt(ses);
-    }
-    else
-    {
+    } else {
         if ((ln = searchnode_list(mysubs, left)) != NULL)
             deletenode_list(mysubs, ln);
         insertnode_list(mysubs, left, right, 0, ALPHA);
         subnum++;
-        if (ses->mesvar[2])
-        {
+        if (ses->mesvar[2]) {
             if (strcmp(right, EMPTY_LINE))
                 tintin_printf(ses, "#Ok. {%s} now replaces {%s}.", right, left);
             else
@@ -86,8 +77,7 @@ void gag_command(char *arg, struct session *ses)
 {
     char temp[BUFFER_SIZE];
 
-    if (!*arg)
-    {
+    if (!*arg) {
         parse_sub("", 1, ses);
         return;
     }
@@ -110,15 +100,12 @@ static void unsub(char *arg, int gag, struct session *ses)
     mysubs = ses->subs;
     temp = mysubs;
     arg = get_arg_in_braces(arg, left, 1);
-    while ((ln = search_node_with_wild(temp, left)) != NULL)
-    {
-        if (gag && strcmp(ln->right,EMPTY_LINE))
-        {
+    while ((ln = search_node_with_wild(temp, left)) != NULL) {
+        if (gag && strcmp(ln->right,EMPTY_LINE)) {
             temp=ln;
             continue;
         }
-        if (ses->mesvar[2])
-        {
+        if (ses->mesvar[2]) {
             if (!strcmp(ln->right,EMPTY_LINE))
                 tintin_printf(ses, "#Ok. {%s} is no longer gagged.", ln->left);
             else
@@ -160,10 +147,8 @@ void do_all_sub(char *line, struct session *ses)
     ln = ses->subs;
 
     while ((ln = ln->next))
-        if (check_one_action(line, ln->left, &vars, 0, ses))
-        {
-            if (!strcmp(ln->right, EMPTY_LINE))
-            {
+        if (check_one_action(line, ln->left, &vars, 0, ses)) {
+            if (!strcmp(ln->right, EMPTY_LINE)) {
                 strcpy(line, EMPTY_LINE);
                 return;
             };
@@ -174,8 +159,7 @@ void do_all_sub(char *line, struct session *ses)
             len=strlen(tmp2);
             APPEND(tmp2);
             while (*match_end)
-                if (check_one_action(l=match_end, ln->left, &vars, 1, ses))
-                {
+                if (check_one_action(l=match_end, ln->left, &vars, 1, ses)) {
                     /* no gags possible here */
                     len=match_start-l;
                     APPEND(l);
@@ -183,9 +167,7 @@ void do_all_sub(char *line, struct session *ses)
                     substitute_myvars(tmp1, tmp2, ses);
                     len=strlen(tmp2);
                     APPEND(tmp2);
-                }
-                else
-                {
+                } else {
                     len=strlen(l);
                     APPEND(l);
                     break;
@@ -201,8 +183,7 @@ void changeto_command(char *arg, struct session *ses)
 {
     char left[BUFFER_SIZE], temp[BUFFER_SIZE];
 
-    if (!_)
-    {
+    if (!_) {
         tintin_eprintf(ses, "#ERROR: #change is allowed only inside an action/promptaction");
         return;
     }
@@ -215,8 +196,7 @@ void changeto_command(char *arg, struct session *ses)
 
 void gagthis_command(char *arg, struct session *ses)
 {
-    if (!_)
-    {
+    if (!_) {
         tintin_eprintf(ses, "#ERROR: #gagthis is allowed only inside an action/promptaction");
         return;
     }
