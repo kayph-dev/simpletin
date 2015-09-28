@@ -1,10 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
 
 #include "tintin.h"
 #include "print.h"
+#include "utils.h"
 #include "scripting/lua.h"
+
+
+static void build_script_path(const char *name, char *out, size_t max);
 
 
 void setup_scripting_environment(struct session *ses)
@@ -14,11 +21,32 @@ void setup_scripting_environment(struct session *ses)
     if (!ses->lua)
         return;
 
-    luaL_openlibs(ses->lua);
+    execute_script_file(ses, "init");
 }
 
 void destroy_scripting_environment(struct session *ses)
 {
     lua_close(ses->lua);
     ses->lua = NULL;
+}
+
+int execute_script_file(struct session *ses, const char *name)
+{
+    char path[1024];
+
+    build_script_path(name, path, 1024);
+
+    return !(luaL_loadfile(ses->lua, path) || lua_pcall(ses->lua, 0, 0, 0));
+}
+
+
+static void build_script_path(const char *name, char *out, size_t max)
+{
+    char *home = getenv("HOME");
+    char *format = "%s/%s/scripts/%s";
+
+    if (!endswith(name, ".lua"))
+        format = "%s/%s/scripts/%s.lua";
+
+    snprintf(out, max, format, home, CONFIG_DIR, name);
 }
