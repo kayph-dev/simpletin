@@ -39,7 +39,8 @@ set(SOURCES
     print.c
     ssl.c
 
-    scripting/init.c)
+    scripting/init.c
+    scripting/terminal.c)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)

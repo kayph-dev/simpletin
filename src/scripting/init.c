@@ -59,6 +59,7 @@ static void build_script_path(const char *name, char *out, size_t max)
 static void open_libraries(struct session *ses)
 {
     luaL_openlibs(ses->lua);
+    luaopen_terminal(ses->lua);
 }
 
 static void init_variables(struct session *ses)

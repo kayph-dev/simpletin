@@ -1,6 +1,8 @@
 #ifndef __SIMPLETIN_SCRIPTING_LUA_H__
 #define __SIMPLETIN_SCRIPTING_LUA_H__
 
+#include <lua.h>
+
 struct session;
 
 /**
@@ -21,5 +23,7 @@ void destroy_scripting_environment(struct session *ses);
  * @return 0 on error, 1 on success.
  */
 int execute_script_file(struct session *ses, const char *name);
+
+int luaopen_terminal(lua_State *s);
 
 #endif /* end of include guard: __SIMPLETIN_SCRIPTING_LUA_H__ */
