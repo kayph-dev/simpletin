@@ -97,7 +97,7 @@
 #define DEFAULT_COMPRESSION_EXT ""
 #endif
 #define NEWS_FILE   "NEWS"
-#define CONFIG_DIR ".tintin"
+#define CONFIG_DIR ".simpletin"
 #define CERT_DIR   "ssl"
 
 #define DEFAULT_DISPLAY_BLANK TRUE        /* blank lines */
