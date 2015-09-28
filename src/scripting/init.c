@@ -12,6 +12,8 @@
 
 
 static void build_script_path(const char *name, char *out, size_t max);
+static void open_libraries(struct session *ses);
+static void init_variables(struct session *ses);
 
 
 void setup_scripting_environment(struct session *ses)
@@ -20,6 +22,9 @@ void setup_scripting_environment(struct session *ses)
 
     if (!ses->lua)
         return;
+
+    open_libraries(ses);
+    init_variables(ses);
 
     execute_script_file(ses, "init");
 }
@@ -49,4 +54,16 @@ static void build_script_path(const char *name, char *out, size_t max)
         format = "%s/%s/scripts/%s.lua";
 
     snprintf(out, max, format, home, CONFIG_DIR, name);
+}
+
+static void open_libraries(struct session *ses)
+{
+    luaL_openlibs(ses->lua);
+}
+
+static void init_variables(struct session *ses)
+{
+    /* setup global session variable */
+    lua_pushlightuserdata(ses->lua, ses);
+    lua_setglobal(ses->lua, "session");
 }
