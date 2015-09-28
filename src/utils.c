@@ -5,6 +5,9 @@
 /*          (T)he K(I)cki(N) (T)ickin D(I)kumud Clie(N)t             */
 /*                     coded by peter unold 1992                     */
 /*********************************************************************/
+#include <strings.h>
+#include <string.h>
+
 #include "tintin.h"
 #include "ui.h"
 
@@ -16,6 +19,19 @@ void syserr(char *msg, ...);
 int is_abrev(char *s1, char *s2)
 {
     return !strncmp(s2, s1, strlen(s1));
+}
+
+int endswith(const char *string, const char *needle)
+{
+    size_t string_len = strlen(string);
+    size_t needle_len = strlen(needle);
+
+    if (string_len < needle_len)
+        return FALSE;
+
+    size_t index = string_len - needle_len;
+
+    return strncasecmp(string + index, needle, needle_len) == 0;
 }
 
 /********************************/
