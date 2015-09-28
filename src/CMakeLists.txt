@@ -37,7 +37,9 @@ set(SOURCES
     wcwidth.c
     chinese.c
     print.c
-    ssl.c)
+    ssl.c
+
+    scripting/init.c)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)

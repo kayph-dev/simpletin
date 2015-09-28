@@ -219,6 +219,7 @@
 #include <wchar.h>
 #include <signal.h>
 #include <errno.h>
+#include <lua.h>
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -297,6 +298,7 @@ struct charset_conv {
 
 struct session {
     struct session *next;
+    lua_State *lua;
     char *name;
     char *address;
     int tickstatus;
