@@ -49,10 +49,6 @@ bool add_trigger(struct session *ses, const char *name, const char *desc,
 
 void process_triggers(struct session *ses, const char *line)
 {
-    if (!ses->triggers)
-        if (add_trigger(ses, "say trigger", "triggered when I say somethign", "^You say"))
-            tintin_printf(NULL, "Added");
-
     for (GSList *iter = ses->triggers; iter; iter = iter->next) {
         struct trigger *trig = iter->data;
 
@@ -66,7 +62,7 @@ void process_triggers(struct session *ses, const char *line)
             continue;
         }
 
-        tintin_printf(NULL, "Matched trigger '%s'", trig->name);
+        /* match a trigger, call callback! */
     }
 }
 
