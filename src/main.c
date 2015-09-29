@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <sys/resource.h>
 #include "ui.h"
+#include "trigger.h"
 
 #ifndef BADSIG
 #define BADSIG (void (*)())-1
@@ -847,6 +848,7 @@ static void do_one_line(char *line,int nl,struct session *ses)
     if (isnb&&!ses->togglesubs)
         do_all_high(line, ses);
     PROF("display");
+    process_triggers(ses, line);
     if (isnotblank(line,ses->blank)) {
         if (ses==activesession) {
             if (nl) {
