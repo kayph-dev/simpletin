@@ -44,7 +44,6 @@ bool add_trigger(struct session *ses, const char *name, const char *desc,
 
 void process_triggers(struct session *ses, const char *line)
 {
-    tintin_printf(NULL, "HERE: %d", g_slist_length(ses->triggers));
     for (GSList *iter = ses->triggers; iter; iter = iter->next) {
         struct trigger *trig = iter->data;
 
