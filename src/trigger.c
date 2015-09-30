@@ -4,6 +4,9 @@
 
 #include <glib.h>
 #include <pcre.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 #include "tintin.h"
 #include "trigger.h"
@@ -57,8 +60,31 @@ void process_triggers(struct session *ses, const char *line)
             continue;
         }
 
-        /* match a trigger, call callback! */
-        l_call_trigger(ses, trig);
+        /* get callback function from registry index */
+        lua_rawgeti(ses->lua, LUA_REGISTRYINDEX, trig->callback);
+        luaL_checktype(ses->lua, -1, LUA_TFUNCTION);
+
+        /* create table with all matches */
+        lua_createtable(ses->lua, ret - 1, 0);
+        for (int i=1; i < ret; i++) {
+            size_t start = subs[2 * i];
+            size_t end = subs[2 * i + 1];
+            size_t length = end - start;
+            char match[1024];
+
+            memcpy(match, line + start, length);
+            match[length] = '\0';
+
+            lua_pushinteger(ses->lua, i);
+            lua_pushstring(ses->lua, match);
+            lua_settable(ses->lua, -3);
+        }
+
+        /* call function */
+        if (lua_pcall(ses->lua, 1, 0, 0) != 0) {
+            tintin_printf(NULL, "[Trigger] Failed to call function: %s", lua_tostring(ses->lua, -1));
+            lua_pop(ses->lua, 1);
+        }
     }
 }
 

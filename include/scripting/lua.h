@@ -28,6 +28,4 @@ int execute_script_file(struct session *ses, const char *name);
 int luaopen_terminal(lua_State *s);
 int luaopen_trigger(lua_State *s);
 
-void l_call_trigger(struct session *ses, struct trigger *trig);
-
 #endif /* end of include guard: __SIMPLETIN_SCRIPTING_LUA_H__ */

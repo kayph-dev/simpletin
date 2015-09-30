@@ -43,17 +43,6 @@ static const struct luaL_Reg trigger_lib[] = {
     { NULL, NULL }
 };
 
-void l_call_trigger(struct session *ses, struct trigger *trig)
-{
-    lua_rawgeti(ses->lua, LUA_REGISTRYINDEX, trig->callback);
-    luaL_checktype(ses->lua, -1, LUA_TFUNCTION);
-
-    if (lua_pcall(ses->lua, 0, 0, 0) != 0) {
-        tintin_printf(NULL, "[Trigger] Failed to call callback: %s", lua_tostring(ses->lua, -1));
-        lua_pop(ses->lua, 1);
-    }
-}
-
 int luaopen_trigger(lua_State *s)
 {
     luaL_register(s, "trigger", trigger_lib);
