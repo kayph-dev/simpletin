@@ -6,18 +6,6 @@
 #include "print.h"
 #include "trigger.h"
 
-static struct session *get_session(lua_State *s)
-{
-    lua_getglobal(s, "session");
-
-    if (!lua_isuserdata(s, -1))
-        return NULL;
-
-    struct session *ses = lua_touserdata(s, -1);
-    lua_pop(s, 1);
-
-    return ses;
-}
 
 static int trigger_add(lua_State *s)
 {
