@@ -11,12 +11,6 @@
 #undef TERM_DEBUG       /* debugging pseudo-tty stuff */
 #undef PROFILING        /* profiling */
 
-/************************/
-/* The meaning of life: */
-/************************/
-#define TRUE 1
-#define FALSE 0
-
 /**********************/
 /* color ANSI numbers */
 /**********************/
@@ -90,14 +84,14 @@
 #ifndef DEFAULT_FILE_DIR
 #define DEFAULT_FILE_DIR "." /* Path to Tintin files, or HOME */
 #endif
-#if COMPRESSED_HELP
+#ifdef COMPRESSED_HELP
 #define DEFAULT_COMPRESSION_EXT ".gz"     /* for compress: ".Z" */
 #define DEFAULT_EXPANSION_STR "gzip -cd " /* for compress: "uncompress -c" */
 #else
 #define DEFAULT_COMPRESSION_EXT ""
 #endif
 #define NEWS_FILE   "NEWS"
-#define CONFIG_DIR ".tintin"
+#define CONFIG_DIR ".simpletin"
 #define CERT_DIR   "ssl"
 
 #define DEFAULT_DISPLAY_BLANK TRUE        /* blank lines */
@@ -219,6 +213,8 @@
 #include <wchar.h>
 #include <signal.h>
 #include <errno.h>
+#include <lua.h>
+#include <glib.h>
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -297,6 +293,8 @@ struct charset_conv {
 
 struct session {
     struct session *next;
+    lua_State *lua;
+    GSList *triggers;
     char *name;
     char *address;
     int tickstatus;

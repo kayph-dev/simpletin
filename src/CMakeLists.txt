@@ -37,7 +37,12 @@ set(SOURCES
     wcwidth.c
     chinese.c
     print.c
-    ssl.c)
+    ssl.c
+    trigger.c
+
+    scripting/init.c
+    scripting/terminal.c
+    scripting/trigger.c)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)
@@ -94,13 +99,13 @@ add_custom_command(TARGET ${PROJECT_NAME}
     PRE_BUILD
     COMMAND gzip -n9 < ${PROJECT_SOURCE_DIR}/data/kbtin_help.in > ${PROJECT_BINARY_DIR}/KBtin_help.gz)
 
-find_package(GLIB2)
 find_package(Util)
 find_package(Nsl)
 find_package(Resolve)
 find_package(Socket)
 find_package(GnuTLS)
 find_package(ZLIB)
+find_package(GLIB2 REQUIRED)
 find_package(PCRE REQUIRED)
 find_package(Lua51 REQUIRED)
 

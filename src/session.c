@@ -20,6 +20,8 @@
 #include "utils.h"
 #include "variables.h"
 #include "ui.h"
+#include "scripting/lua.h"
+#include "trigger.h"
 #ifdef HAVE_GNUTLS
 #include "ssl.h"
 #else
@@ -268,6 +270,7 @@ static struct session *new_session(char *name, char *address, int sock, int isso
 
     newsession = TALLOC(struct session);
 
+    newsession->triggers = NULL;
     newsession->name = mystrdup(name);
     newsession->address = mystrdup(address);
     newsession->tickstatus = FALSE;
@@ -347,6 +350,7 @@ static struct session *new_session(char *name, char *address, int sock, int isso
 #endif
     sessionlist = newsession;
     activesession = newsession;
+    setup_scripting_environment(newsession);
 
     return do_hook(newsession, HOOK_OPEN, 0, 0);
 }
@@ -382,6 +386,8 @@ void cleanup_session(struct session *ses)
         user_textout(ses->last_line);
     };
     sprintf(buf, "#SESSION '%s' DIED.", ses->name);
+    destroy_scripting_environment(ses);
+    g_slist_free_full(ses->triggers, (GDestroyNotify)destroy_trigger);
     tintin_puts(buf, NULL);
     if (close(ses->socket) == -1)
         syserr("close in cleanup");
