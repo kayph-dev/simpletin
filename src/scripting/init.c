@@ -23,8 +23,8 @@ void setup_scripting_environment(struct session *ses)
     if (!ses->lua)
         return;
 
-    open_libraries(ses);
     init_variables(ses);
+    open_libraries(ses);
 
     if (!execute_script_file(ses, "init")) {
         tintin_printf(NULL, "[Lua]: %s", lua_tostring(ses->lua, -1));
