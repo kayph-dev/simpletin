@@ -6,7 +6,7 @@
 #include "net.h"
 #include "scripting/lua.h"
 
-static int network_write(lua_State *state)
+static int session_write(lua_State *state)
 {
     const char *text = luaL_checkstring(state, 1);
     struct session *ses = get_session(state);
@@ -16,14 +16,14 @@ static int network_write(lua_State *state)
     return 0;
 }
 
-static const struct luaL_Reg network_lib[] = {
-    { "write", network_write },
+static const struct luaL_Reg session_lib[] = {
+    { "write", session_write },
     { NULL, NULL }
 };
 
-int luaopen_network(lua_State *s)
+int luaopen_session(lua_State *s)
 {
-    luaL_register(s, "net", network_lib);
+    luaL_register(s, "session", session_lib);
 
     return 1;
 }
