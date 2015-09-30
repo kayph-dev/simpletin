@@ -11,6 +11,7 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <netdb.h>
+#include <string.h>
 #include "tintin.h"
 #include "files.h"
 #include "hooks.h"
@@ -214,9 +215,12 @@ static void alarm_func(int k)
 /********************************************************************/
 /* write line to the mud ses is connected to - add \n or \r\n first */
 /********************************************************************/
-void write_line_mud(char *line, struct session *ses)
+void write_line_mud(const char *line_in, struct session *ses)
 {
     char rstr[BUFFER_SIZE];
+    char line[BUFFER_SIZE];
+
+    strncpy(line, line_in, BUFFER_SIZE);
 
     if (*line)
         ses->idle_since=time(0);

@@ -42,7 +42,9 @@ set(SOURCES
 
     scripting/init.c
     scripting/terminal.c
-    scripting/trigger.c)
+    scripting/trigger.c
+    scripting/common.c
+    scripting/network.c)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)
