@@ -64,6 +64,7 @@ static void open_libraries(struct session *ses)
     luaL_openlibs(ses->lua);
     luaopen_terminal(ses->lua);
     luaopen_trigger(ses->lua);
+    luaopen_network(ses->lua);
 }
 
 static void init_variables(struct session *ses)

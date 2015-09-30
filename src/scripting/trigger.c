@@ -5,6 +5,7 @@
 #include "tintin.h"
 #include "print.h"
 #include "trigger.h"
+#include "scripting/lua.h"
 
 
 static int trigger_add(lua_State *s)
