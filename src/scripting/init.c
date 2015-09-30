@@ -14,6 +14,7 @@
 static void build_script_path(const char *name, char *out, size_t max);
 static void open_libraries(struct session *ses);
 static void init_variables(struct session *ses);
+static void fix_package_path(struct session *ses);
 
 
 void setup_scripting_environment(struct session *ses)
@@ -23,8 +24,9 @@ void setup_scripting_environment(struct session *ses)
     if (!ses->lua)
         return;
 
-    open_libraries(ses);
     init_variables(ses);
+    open_libraries(ses);
+    fix_package_path(ses);
 
     if (!execute_script_file(ses, "init")) {
         tintin_printf(NULL, "[Lua]: %s", lua_tostring(ses->lua, -1));
@@ -64,12 +66,24 @@ static void open_libraries(struct session *ses)
     luaL_openlibs(ses->lua);
     luaopen_terminal(ses->lua);
     luaopen_trigger(ses->lua);
-    luaopen_network(ses->lua);
+    luaopen_session(ses->lua);
 }
 
 static void init_variables(struct session *ses)
 {
     /* setup global session variable */
     lua_pushlightuserdata(ses->lua, ses);
-    lua_setglobal(ses->lua, "session");
+    lua_setglobal(ses->lua, "_session");
+}
+
+static void fix_package_path(struct session *ses)
+{
+    char script_path[1024];
+    snprintf(script_path, 1024, "?;?.lua;%s/%s/scripts/?.lua", getenv("HOME"), CONFIG_DIR);
+
+    lua_getfield(ses->lua, LUA_GLOBALSINDEX, "package");
+    lua_getfield(ses->lua, -1, "path");
+    lua_pushstring(ses->lua, script_path);
+    lua_concat(ses->lua, 2);
+    lua_setfield(ses->lua, -2, "path");
 }

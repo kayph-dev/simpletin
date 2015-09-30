@@ -44,7 +44,7 @@ set(SOURCES
     scripting/terminal.c
     scripting/trigger.c
     scripting/common.c
-    scripting/network.c)
+    scripting/session.c)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)

@@ -27,7 +27,7 @@ int execute_script_file(struct session *ses, const char *name);
 
 int luaopen_terminal(lua_State *s);
 int luaopen_trigger(lua_State *s);
-int luaopen_network(lua_State *s);
+int luaopen_session(lua_State *s);
 
 struct session *get_session(lua_State *s);
 
