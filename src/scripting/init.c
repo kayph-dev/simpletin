@@ -14,6 +14,7 @@
 static void build_script_path(const char *name, char *out, size_t max);
 static void open_libraries(struct session *ses);
 static void init_variables(struct session *ses);
+static void fix_package_path(struct session *ses);
 
 
 void setup_scripting_environment(struct session *ses)
@@ -25,6 +26,7 @@ void setup_scripting_environment(struct session *ses)
 
     init_variables(ses);
     open_libraries(ses);
+    fix_package_path(ses);
 
     if (!execute_script_file(ses, "init")) {
         tintin_printf(NULL, "[Lua]: %s", lua_tostring(ses->lua, -1));
@@ -72,4 +74,13 @@ static void init_variables(struct session *ses)
     /* setup global session variable */
     lua_pushlightuserdata(ses->lua, ses);
     lua_setglobal(ses->lua, "_session");
+}
+
+static void fix_package_path(struct session *ses)
+{
+    lua_getfield(ses->lua, LUA_GLOBALSINDEX, "package");
+    lua_getfield(ses->lua, -1, "path");
+    lua_pushliteral(ses->lua, "?;?.lua;/home/kayph/.simpletin/scripts/?.lua");
+    lua_concat(ses->lua, 2);
+    lua_setfield(ses->lua, -2, "path");
 }
