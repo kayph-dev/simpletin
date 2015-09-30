@@ -78,9 +78,12 @@ static void init_variables(struct session *ses)
 
 static void fix_package_path(struct session *ses)
 {
+    char script_path[1024];
+    snprintf(script_path, 1024, "?;?.lua;%s/%s/scripts/?.lua", getenv("HOME"), CONFIG_DIR);
+
     lua_getfield(ses->lua, LUA_GLOBALSINDEX, "package");
     lua_getfield(ses->lua, -1, "path");
-    lua_pushliteral(ses->lua, "?;?.lua;/home/kayph/.simpletin/scripts/?.lua");
+    lua_pushstring(ses->lua, script_path);
     lua_concat(ses->lua, 2);
     lua_setfield(ses->lua, -2, "path");
 }
