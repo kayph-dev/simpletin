@@ -71,5 +71,5 @@ static void init_variables(struct session *ses)
 {
     /* setup global session variable */
     lua_pushlightuserdata(ses->lua, ses);
-    lua_setglobal(ses->lua, "session");
+    lua_setglobal(ses->lua, "_session");
 }

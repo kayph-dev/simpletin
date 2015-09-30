@@ -2,7 +2,7 @@
 
 struct session *get_session(lua_State *state)
 {
-    lua_getglobal(state, "session");
+    lua_getglobal(state, "_session");
 
     if (!lua_isuserdata(state, -1))
         return NULL;
