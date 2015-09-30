@@ -41,7 +41,8 @@ set(SOURCES
     trigger.c
 
     scripting/init.c
-    scripting/terminal.c)
+    scripting/terminal.c
+    scripting/trigger.c)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)

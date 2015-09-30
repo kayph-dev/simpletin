@@ -26,7 +26,10 @@ void setup_scripting_environment(struct session *ses)
     open_libraries(ses);
     init_variables(ses);
 
-    execute_script_file(ses, "init");
+    if (!execute_script_file(ses, "init")) {
+        tintin_printf(NULL, "[Lua]: %s", lua_tostring(ses->lua, -1));
+        lua_pop(ses->lua, 1);
+    }
 }
 
 void destroy_scripting_environment(struct session *ses)
@@ -60,6 +63,7 @@ static void open_libraries(struct session *ses)
 {
     luaL_openlibs(ses->lua);
     luaopen_terminal(ses->lua);
+    luaopen_trigger(ses->lua);
 }
 
 static void init_variables(struct session *ses)

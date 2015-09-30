@@ -270,7 +270,6 @@ static struct session *new_session(char *name, char *address, int sock, int isso
 
     newsession = TALLOC(struct session);
 
-    setup_scripting_environment(newsession);
     newsession->triggers = NULL;
     newsession->name = mystrdup(name);
     newsession->address = mystrdup(address);
@@ -351,6 +350,7 @@ static struct session *new_session(char *name, char *address, int sock, int isso
 #endif
     sessionlist = newsession;
     activesession = newsession;
+    setup_scripting_environment(newsession);
 
     return do_hook(newsession, HOOK_OPEN, 0, 0);
 }

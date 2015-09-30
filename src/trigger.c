@@ -8,25 +8,19 @@
 #include "tintin.h"
 #include "trigger.h"
 #include "print.h"
-
-struct trigger {
-    pcre *reg;
-    char *name;
-    char *desc;
-    char *pattern;
-};
+#include "scripting/lua.h"
 
 
 bool add_trigger(struct session *ses, const char *name, const char *desc,
-    const char *pattern)
+    const char *pattern, int callback)
 {
     const char *error_str;
     int error_off;
 
     pcre *reg = pcre_compile(pattern, 0, &error_str, &error_off, NULL);
 
-    if (!pattern) {
-        tintin_printf(NULL, "[Trigger] failed to compile pattern '%s': %s",
+    if (!reg) {
+        tintin_printf(NULL, "[Trigger] Failed to compile pattern '%s': %s",
                         pattern, error_str);
         return false;
     }
@@ -38,6 +32,7 @@ bool add_trigger(struct session *ses, const char *name, const char *desc,
         trig->desc = strdup(desc);
         trig->pattern = strdup(pattern);
         trig->reg = reg;
+        trig->callback = callback;
 
         ses->triggers = g_slist_prepend(ses->triggers, trig);
 
@@ -49,6 +44,7 @@ bool add_trigger(struct session *ses, const char *name, const char *desc,
 
 void process_triggers(struct session *ses, const char *line)
 {
+    tintin_printf(NULL, "HERE: %d", g_slist_length(ses->triggers));
     for (GSList *iter = ses->triggers; iter; iter = iter->next) {
         struct trigger *trig = iter->data;
 
@@ -63,6 +59,7 @@ void process_triggers(struct session *ses, const char *line)
         }
 
         /* match a trigger, call callback! */
+        l_call_trigger(ses, trig);
     }
 }
 
